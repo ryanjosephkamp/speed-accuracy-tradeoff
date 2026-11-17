@@ -1,13 +1,13 @@
-// Copies the page into a folder ready to deploy: index.html, css, js, data, and _headers (which
-// keeps the preview out of search engines). Leaves out site/tools and the README, and refuses to
-// build if a PDF or any file outside those folders would ship.
+// Copies the page into a folder ready to deploy: index.html, css, js, data, fonts, img (the share
+// card), and _headers. Leaves out site/tools and the README, and refuses to build if a PDF or any
+// file outside those folders would ship.
 //   node site/tools/build.mjs <out-dir>
 import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const out = process.argv[2];
 if (!out) throw new Error("usage: node site/tools/build.mjs <out-dir>");
-const SHIP = ["index.html", "_headers", "css", "js", "data", "fonts"];
+const SHIP = ["index.html", "_headers", "css", "js", "data", "fonts", "img"];
 if (existsSync(out)) rmSync(out, { recursive: true });
 mkdirSync(out, { recursive: true });
 for (const name of SHIP) cpSync(join("site", name), join(out, name), { recursive: true });

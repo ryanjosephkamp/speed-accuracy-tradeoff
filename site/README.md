@@ -46,6 +46,7 @@ It's static HTML, CSS, and JavaScript modules with no framework.
 | `data/heldout.json` | The held-out schedules' parameters and losses, written by `tools/build_reference.py` |
 | `data/checks.json` | The last full run of `tools/check_site.mjs`, shown on the page |
 | `fonts/` | Archivo and Source Serif 4 (Latin subsets), under the SIL Open Font License |
+| `img/share.png` | The share card: the top of the page at 1200 by 630 |
 
 ## Update the data
 
@@ -97,4 +98,4 @@ python3 -m http.server 8000 --directory site
 node site/tools/build.mjs <out-dir>
 ```
 
-The build copies the page and `_headers`, which keeps a preview out of search engines.
+The build copies the page and `_headers`, which sets the security headers and lets search engines index the page (Cloudflare marks preview deployments `noindex` unless `_headers` removes it).
