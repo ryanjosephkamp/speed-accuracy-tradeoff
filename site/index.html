@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deciding when time gets expensive</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="The speed-accuracy trade-off, run live: watch a decision being made, set its bound, then draw a changing cost and see the best bound move before the cost does.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#eef0f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0e0f" media="(prefers-color-scheme: dark)">
+<link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/source-serif-4-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/site.css">
+<script>
+  // a theme and color chosen on an earlier visit, set before the first paint (appearance.js)
+  document.documentElement.classList.add("scripted");
+  try {
+    const kept = JSON.parse(localStorage.getItem("sat-appearance") || "null");
+    if (kept) {
+      const root = document.documentElement;
+      if (kept.theme === "light" || kept.theme === "dark") root.dataset.theme = kept.theme;
+      for (const [name, value] of Object.entries(kept.tones || {})) {
+        if (/^--dial-(light|dark)-[a-z-]+$/.test(name) && /^#[0-9a-f]{6}$/i.test(value)) root.style.setProperty(name, value);
+      }
+    }
+  } catch {}
+</script>
+<link rel="modulepreload" href="js/model.js">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0c0d'/%3E%3Cpath d='M4 22c4-1 5-9 9-8s4 6 7 3 3-9 8-11' fill='none' stroke='%23eceeea' stroke-width='2.4'/%3E%3Cpath d='M4 6h24' stroke='%23ff5a24' stroke-width='2.4'/%3E%3C/svg%3E">
+</head>
+<body>
+<a class="skip" href="#why">Skip to the text</a>
+
+<header class="bar">
+  <a class="bar-title" href="#top">Deciding when time gets expensive</a>
+  <details class="toc" id="toc">
+    <summary>Contents<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></summary>
+    <ol>
+      <li><a href="#top">The decision machine</a></li>
+      <li><a href="#play">Your turn</a></li>
+      <li><a href="#value">What it could be good for</a></li>
+      <li><a href="#glimpse">One glimpse at a time</a></li>
+      <li><a href="#trade-off">The trade-off</a></li>
+      <li><a href="#changing">When the cost of time changes</a></li>
+      <li><a href="#weights">How far ahead to look</a></li>
+      <li><a href="#evidence">How well it holds up</a></li>
+      <li><a href="#first-order">Exact to first order</a></li>
+      <li><a href="#unknown">When the evidence’s strength is unknown</a></li>
+      <li><a href="#changed">What changed since 2025</a></li>
+      <li><a href="#links">Paper, code, and checks</a></li>
+    </ol>
+  </details>
+  <button type="button" class="bar-btn" id="sound-switch" aria-pressed="false" hidden>
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path class="spk" d="M2.5 6.1h2.3L8.2 3.3v9.4L4.8 9.9H2.5z"/><path class="wave" d="M10.5 5.7a3.1 3.1 0 0 1 0 4.6M12.3 4a5.5 5.5 0 0 1 0 8"/><path class="mute" d="M10.6 6.2l3.6 3.6M14.2 6.2l-3.6 3.6"/></svg>
+    <span class="sound-word visually-hidden">Sound off</span>
+  </button>
+  <div class="appearance-end">
+    <div class="appearance" data-appearance hidden>
+      <button type="button" class="bar-btn appearance-button" data-appearance-button aria-expanded="false" aria-controls="appearance-panel">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.75s-4.25 4.6-4.25 7.6a4.25 4.25 0 0 0 8.5 0c0-3-4.25-7.6-4.25-7.6Z"/></svg>
+        <span class="visually-hidden">Theme and color</span>
+      </button>
+      <div class="appearance-panel" id="appearance-panel" data-appearance-panel hidden>
+        <fieldset class="appearance-themes">
+          <legend>Theme</legend>
+          <div class="appearance-seg">
+            <label>
+              <input class="visually-hidden" type="radio" name="theme" value="system">
+              <svg class="ed" viewBox="0 0 30 22" aria-hidden="true"><rect class="g-l" width="30" height="22"/><path class="g-d" d="M30 0V22H0Z"/><path class="w-l" d="M7 2C8 12 11 17 13 21"/><path class="w-d" d="M23 2C22 12 19 17 17 21"/></svg>
+              <span>Follow the system</span>
+            </label>
+            <label>
+              <input class="visually-hidden" type="radio" name="theme" value="light">
+              <svg class="ed ed-light" viewBox="0 0 30 22" aria-hidden="true"><rect class="g" width="30" height="22"/><path class="w" d="M7 2C8 12 11 17 13 21M23 2C22 12 19 17 17 21"/><path class="t" d="M15 2l2 3-2 3 2 3 2 3-2 3"/></svg>
+              <span>Light</span><small>Ink on silver paper</small>
+            </label>
+            <label>
+              <input class="visually-hidden" type="radio" name="theme" value="dark">
+              <svg class="ed ed-dark" viewBox="0 0 30 22" aria-hidden="true"><rect class="g" width="30" height="22"/><path class="w" d="M7 2C8 12 11 17 13 21M23 2C22 12 19 17 17 21"/><path class="t" d="M15 2l2 3-2 3 2 3 2 3-2 3"/></svg>
+              <span>Dark</span><small>Light on a black print</small>
+            </label>
+          </div>
+        </fieldset>
+        <div class="appearance-dial">
+          <label for="appearance-hue"><i>Its color:</i> <span class="appearance-hue-name" data-hue-name></span></label>
+          <div class="appearance-dial-row">
+            <input id="appearance-hue" type="range" data-hue>
+            <button type="button" class="appearance-reset" data-hue-reset>Use the default</button>
+          </div>
+          <p class="appearance-note">Every color that means something turns together, by the same angle. Each shifts only as far as it must to stay readable in both themes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bar-scale" aria-hidden="true"><span id="progress"></span></div>
+</header>
+
+<main id="top">
+<article>
+
+<section class="hero print" aria-labelledby="h-title">
+  <header class="hero-copy">
+    <h1 id="h-title" data-block="title">Deciding when time gets expensive</h1>
+    <p class="lede" data-block="lede">Every ball is a driverless car that must swerve left or right around something on the road ahead of it. Choose the wrong side, or take too long to decide, and it could be disastrous. A bound is the level the running total of evidence has to reach before the car decides. The best bounds start moving before the cost of time changes.</p>
+    <p class="byline">Ryan Kamp · November 2026 · Draft</p>
+  </header>
+  <div class="machine-stage">
+    <canvas id="machine-glow" aria-hidden="true"></canvas>
+    <canvas id="machine" role="img" aria-label="A board of pegs. Balls drop from the top center and bounce left or right at each peg, a little more often to the right, until they reach one of two bounds; decisions pile up beside the bounds at the time they were made."></canvas>
+    <button type="button" class="cost-handle" id="cost-handle" aria-label="Move the moment the cost of time rises; arrow keys move it"><span id="cost-handle-label">Cost ×16 here</span></button>
+    <button type="button" class="btn btn-go m-tour-float" id="m-walk-start">Walk me through it</button>
+  </div>
+  <div class="machine-deck">
+    <section class="m-walk" id="m-walk" aria-labelledby="m-walk-title" hidden>
+      <div class="m-walk-head">
+        <p class="m-walk-count" id="m-walk-count"></p>
+        <button type="button" class="m-walk-x" id="m-walk-done" aria-label="End the walkthrough"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+      </div>
+      <h2 class="m-walk-title" id="m-walk-title"></h2>
+      <p class="m-walk-say" id="m-walk-say" aria-live="polite"></p>
+      <p class="m-walk-term" id="m-walk-term" aria-live="polite" hidden></p>
+      <div class="m-walk-tools">
+        <button type="button" class="btn btn-quiet" id="m-walk-play" aria-pressed="false">Play</button>
+        <button type="button" class="btn btn-quiet" id="m-walk-step">One reading</button>
+        <span class="m-walk-extra" id="m-walk-extra"></span>
+      </div>
+      <div class="m-walk-nav">
+        <button type="button" class="btn" id="m-walk-back">Back</button>
+        <button type="button" class="btn btn-go" id="m-walk-next">Next</button>
+      </div>
+    </section>
+    <fieldset class="seg" id="m-mode">
+      <legend data-term="walls">Bounds</legend>
+      <div class="seg-row">
+        <label><input type="radio" name="m-mode" value="exact" checked><span data-term="best">The best</span></label>
+        <label><input type="radio" name="m-mode" value="pm"><span data-term="pm">The 2025 rule</span></label>
+        <label><input type="radio" name="m-mode" value="yours"><span data-term="yours">Yours</span></label>
+      </div>
+    </fieldset>
+    <div class="m-yours-help" id="m-yours-help" hidden>
+      <p class="help">Your bounds start as my 2025 rule’s. Redraw them: drag down the board, and each row’s bound goes where your finger passes. Can you beat the rule?</p>
+      <button type="button" class="btn" id="m-straighten">Start over</button>
+    </div>
+    <div class="m-score-block">
+      <dl class="m-score">
+        <div class="k-ex"><dt data-term="score-best">Best bounds</dt><dd id="m-exact">–</dd></div>
+        <div class="k-pm"><dt data-term="score-pm">2025 rule</dt><dd id="m-pm">–</dd></div>
+        <div><dt data-term="gap">The rule gives up</dt><dd id="m-gap">–</dd></div>
+        <div id="m-yours-row" hidden><dt>Your bounds</dt><dd id="m-yours">–</dd><p class="m-vs" id="m-yours-vs"></p></div>
+      </dl>
+      <p class="m-unit" data-term="points">Points per 100 decisions, exact for this board: 1 for each correct choice, minus the cost of the time spent</p>
+    </div>
+    <div class="actions m-actions">
+      <button type="button" class="btn" id="m-pour" data-term="pour">Pour 5,000</button>
+      <button type="button" class="btn btn-quiet" id="m-look" aria-pressed="false" data-term="look">Look ahead</button>
+      <button type="button" class="btn btn-quiet m-pause" id="m-pause" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path class="i-pause" d="M5 3.5v9M11 3.5v9"/><path class="i-play" d="M5 3.2l8 4.8-8 4.8z"/></svg><span>Pause</span></button>
+      <button type="button" class="btn btn-quiet" id="m-tilt" aria-pressed="false" data-term="tilt">Tilt the board</button>
+    </div>
+    <div class="m-yours-help m-look-help" id="m-look-help" aria-live="polite" hidden>
+      <p class="help"></p>
+    </div>
+    <details class="m-more">
+      <summary>Adjust the machine<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></summary>
+      <div class="m-more-body">
+        <fieldset class="seg" id="m-view">
+          <legend data-term="show">Show</legend>
+          <div class="seg-row">
+            <label><input type="radio" name="m-view" value="balls" checked><span data-term="balls">Balls</span></label>
+            <label><input type="radio" name="m-view" value="flow"><span data-term="flow">Every path, exactly</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="seg" id="m-sched">
+          <legend data-term="cost">Cost of time</legend>
+          <div class="seg-row">
+            <label><input type="radio" name="m-sched" value="rises" checked><span data-term="rises">Rises</span></label>
+            <label><input type="radio" name="m-sched" value="deadline"><span data-term="deadline">Deadline</span></label>
+            <label><input type="radio" name="m-sched" value="constant"><span data-term="constant">Constant</span></label>
+          </div>
+        </fieldset>
+        <div class="dials">
+          <label class="dial"><span class="dial-key" id="m-at-key" data-term="at">When the cost rises</span><output id="m-at-out" for="m-at"></output><input type="range" id="m-at" min="0.1" max="2.8" step="0.01" value="0.6"></label>
+          <label class="dial"><span class="dial-key" data-term="factor">By how much</span><output id="m-factor-out" for="m-factor"></output><input type="range" id="m-factor" min="1" max="5" step="0.01" value="4"></label>
+          <label class="dial"><span class="dial-key" data-term="mu">Evidence strength</span><output id="m-mu-out" for="m-mu">1.00×</output><input type="range" id="m-mu" min="-1.32" max="1.32" step="0.01" value="0"></label>
+          <label class="dial"><span class="dial-key" data-term="c0">Starting cost per unit time</span><output id="m-cost-out" for="m-cost"></output><input type="range" id="m-cost" min="-2" max="0" step="0.01" value="-1"></label>
+        </div>
+        <dl class="tally m-tally">
+          <div><dt data-term="n">Decisions</dt><dd id="m-n">0</dd></div>
+          <div><dt data-term="correct">Correct</dt><dd><span id="m-p">–</span><small id="m-p-exp"></small></dd></div>
+          <div><dt data-term="time">Mean time</dt><dd><span id="m-t">–</span><small id="m-t-exp"></small></dd></div>
+        </dl>
+        <div class="actions">
+          <button type="button" class="btn" id="m-save">Save picture</button>
+        </div>
+      </div>
+    </details>
+  </div>
+  <p id="machine-cap" class="print-cap m-cap"><span>The truth is always “right” here, so every decision at the left bound is a mistake. Each row of pegs is <span data-lattice="dt"></span> of a time unit (σ²/μ²); each bounce moves the evidence <span data-lattice="delta"></span> (in units of σ²/μ, about 0.2 in log odds at the standard strength), toward the truth with probability <span data-lattice="p"></span>. Scores are exact for this board; the tally counts balls. Tilting the board (or dragging sideways with a mouse) changes the evidence’s strength, and the bounds are solved again. “Look ahead” shows how much each later moment counts for the bound at one moment (drag on the board to pick it): the paper’s look-ahead weights on this board, with the bounds held where they are (dotted <span data-color-word="wb">green</span>); the diamond is where the paper’s look-ahead rule puts the bounds. Both are checked against the paper below. Each bead is one decision until a pile reaches the edge, then all piles shrink together; the ghosts are what the math expects by now. The <span data-color-word="accent">orange</span> glow is how far the cost has risen (log scale, full at 32 times). “Every path, exactly” is the share of balls through each peg, computed rather than sampled. Balls from seed <span id="machine-seed">–</span>.</span></p>
+</section>
+
+<section class="col play-intro" id="play" aria-labelledby="h-play">
+  <h2 id="h-play">Your turn</h2>
+  <div data-block="play-lede">
+    <p>Now you’re the car. A stalled truck blocks one side of the road ahead, hidden in fog, and its hazard lights glint through: each glint shows on the truck’s side <span data-game-n="pct">55</span>% of the time, and as a reflection on the other side for the other <span data-game-n="pctOther">45</span>%. The cost of waiting runs along the bottom. There are three road scenarios. On one road, the cost jumps <span data-game-n="factor">16</span>-fold at a dashed line. On another, the truck is close. And on the third, the cost stays steady with the truck far off in the distance. You see which road you’ve been given before you start. Swerve left or right whenever you’re ready. Then the fog lifts, and the three rules drive the same road with the same glints, so you see where each would have swerved. Nine rounds, against all three.</p>
+  </div>
+</section>
+
+<figure class="print play" id="play-game" aria-labelledby="h-play">
+  <div class="play-head">
+    <p class="play-round"><span id="play-round">Round 1 of 9</span><strong id="play-kind">The cost jumps</strong></p>
+    <p class="play-story" id="play-story"></p>
+    <button type="button" class="btn btn-quiet play-tally" data-play="tally" aria-pressed="false">Add it up for me</button>
+  </div>
+  <div class="lanes-stage play-stage" tabindex="0" aria-describedby="play-story">
+    <canvas class="play-gl" aria-hidden="true"></canvas>
+    <canvas class="play-hud" role="img" aria-label="A road seen from behind your car, with fog ahead. A stalled truck hides in the fog on one side; its hazard lights glint through, more often on its own side. The cost of waiting runs along the bottom. After you swerve the fog lifts, and the best bounds’, the 2025 rule’s, and the look-ahead rule’s cars drive the same road with the same glints."></canvas>
+  </div>
+  <div class="play-controls">
+    <button type="button" class="btn btn-go" data-play="start">Start round</button>
+    <button type="button" class="btn" data-play="left" hidden>◀ Swerve left</button>
+    <button type="button" class="btn" data-play="right" hidden>Swerve right ▶</button>
+    <button type="button" class="btn btn-go" data-play="next" hidden>Next round</button>
+  </div>
+  <p class="play-say" aria-live="polite"></p>
+  <div class="play-result" hidden>
+    <canvas class="play-chart" role="img" aria-label="The round’s readings over time, with each rule’s bounds: a dot where each rule swerved and a ring where you did."></canvas>
+    <table class="play-table">
+      <thead><tr><th scope="col">This round</th><th scope="col">Swerved after</th><th scope="col">Went</th><th scope="col">Points<small>fair</small></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="play-over" hidden><p></p><button type="button" class="btn btn-go" data-play="again">Play again</button></div>
+  <div class="play-board">
+    <p class="play-board-title">Score <span class="play-board-n"></span></p>
+    <table class="play-table">
+      <thead><tr><th scope="col">Driver</th><th scope="col">Points</th><th scope="col">Fair points</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <figcaption class="print-cap"><span data-block="play-note">Points are the paper’s: a point for the clear side, less what the waiting cost. Fair points swap the last coin flip for its odds, the chance your side was clear given the readings you’d seen, so they reward a good decision rather than a lucky one; “expected” is what each rule averages over many rounds of the same roads. In points the rules are close: on these roads the best bounds beat my 2025 rule by <span data-game-n="gapRises">0.99</span> points per 100 decisions when the cost jumps, <span data-game-n="gapDeadline">0.79</span> at a deadline, and <span data-game-n="gapConstant">0.01</span> when it’s steady, so over nine rounds luck often decides the order. Watch when each one swerves instead: the best bounds fall before the cost jumps or the deadline comes, and the 2025 rule’s stay level until it does. A time unit is 6 seconds of play, so the glints come about 17 a second; the steady road, where decisions take longest, plays twice as fast. “Add it up for me” shows the running total of the glints. The arrow keys swerve while a round runs.</span></figcaption>
+</figure>
+
+<section class="col" id="why" aria-labelledby="h-why">
+  <h2 id="h-why">Why the bounds move first</h2>
+  <div data-block="why">
+    <p>Wait longer and you’re more likely to be right. Wait too long and the time costs more than the accuracy is worth. That trade shapes a lot of decisions made under a clock: a scanner deciding whether it has read a code yet, a driverless car deciding which way to swerve before it reaches something in the road, an animal deciding whether a rustle is a predator.</p>
+    <p>Often the price of time changes while you decide. When the change is known in advance, the best strategy doesn’t wait for it: it starts settling for less certainty ahead of it, because a decision still going when the price rises will pay it. That the best strategy does this was known (<a href="https://elifesciences.org/articles/79824">Barendregt and colleagues, 2022</a>, found it numerically); to my knowledge, the paper is the first to work out how far ahead it moves, and the machine above shows it. In a worked example in the paper, the average observer in a classic moving-dot study (Palmer, Huk, and Shadlen 2005), at 6.4% coherence, would move its bounds about <span data-n="PalmerLead">217</span> ms ahead of a slow, predictable change in the cost, if its bounds are the best ones for a steady cost; that’s the first-order lead.</p>
+    <p>My 2025 capstone used a rule that sets the bounds from the cost at each moment, so it reacts only when the cost changes. Switch the bounds to the 2025 rule to see it. The rest of this page builds the picture up from one decision, then measures my 2025 rule and a better one.</p>
+  </div>
+</section>
+
+<section class="col" id="value" aria-labelledby="h-value">
+  <h2 id="h-value">What it could be good for</h2>
+  <div data-block="value-lede">
+    <p>The short answer: its clearest value is a prediction about brains that anyone with the right recordings can test. As a rule for machines, the gain over my 2025 rule is real but usually small, and nobody has tried it outside the model yet. Here is where looking ahead matters, in eight working examples and seven solved cases, four of them the paper’s own.</p>
+    <p>They are grouped by what happens to the cost of time, because that decides how the best bounds move. Each says how well the model fits it: <b>close</b> means the model was made for it, <b>fair</b> that its main assumptions hold, <b>loose</b> that it is an illustration only.</p>
+  </div>
+</section>
+<figure class="print scn-cat" id="scn-deadline" aria-labelledby="scn-a">
+  <header class="scn-cat-head"><span class="scn-cat-k" aria-hidden="true">A</span><h3 id="scn-a">A deadline</h3><p>The best bounds must fall to zero before the window closes. My 2025 rule lowers them only as fast as the cost of the moment rises, and with a steady cost not at all.</p></header>
+  <div class="pilot pilot-lanes car" id="car" tabindex="0" aria-labelledby="car-h" aria-describedby="car-lede">
+    <div class="pilot-head"><h4 id="car-h">The driverless car</h4><span class="fit fit-loose">Loose</span></div>
+    <p class="pilot-lede" id="car-lede">Three cars come up on something in the road and must swerve left or right before the last moment they can still clear it. All three get the same noisy readings, so they differ only in their bounds: the best bounds, my 2025 rule, and the look-ahead rule. You can see which side is clear; the cars can’t. Each reading flashes on the side of the road it points to.</p>
+    <div class="lanes-stage car-stage">
+      <canvas class="car-gl" aria-hidden="true"></canvas>
+      <canvas class="car-hud" role="img" aria-label="Three lanes seen from behind the cars, each with an obstacle ahead and cones on the side that is not clear. Above each car, a gauge shows the running total of its readings and where its bounds are now."></canvas>
+    </div>
+    <div class="pilot-bar">
+      <div class="actions">
+        <button type="button" class="btn" data-car="play" aria-pressed="true">Pause</button>
+        <button type="button" class="btn btn-quiet" data-car="step">One reading</button>
+        <button type="button" class="btn btn-quiet" data-car="next">Next car</button>
+        <button type="button" class="btn btn-quiet" data-car="many">Run 1,000 cars</button>
+      </div>
+      <p class="pilot-status car-status" aria-live="polite"></p>
+    </div>
+    <div class="pilot-runs">
+      <div class="runs-head"><p class="runs-title">When each car swerved</p><p class="runs-key"><span class="rk-fill"><span class="runs-n">0 cars</span></span><span class="rk-line">exact</span></p></div>
+      <svg class="lanes runs-strip" role="img" aria-label="For each rule, how often its car swerves at each moment from first sight to the last moment: exact for this model as a line, the cars run so far filled in under it, and the share still undecided at the last moment as a bar past it."></svg>
+      <table class="runs-sum">
+        <thead><tr><th scope="col"><span class="visually-hidden">Rule</span></th><th scope="col">Clears</th><th scope="col">− Doubt</th><th scope="col">= Points</th></tr></thead>
+        <tbody>
+          <tr class="k-ex"><th scope="row">Best bounds<small>exact</small></th><td data-runs="ex.saves"><b>–</b><small>–</small></td><td data-runs="ex.doubt"><b>–</b><small>–</small></td><td data-runs="ex.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-pm"><th scope="row">2025 rule<small>exact</small></th><td data-runs="pm.saves"><b>–</b><small>–</small></td><td data-runs="pm.doubt"><b>–</b><small>–</small></td><td data-runs="pm.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-wb"><th scope="row">Look-ahead rule<small>exact</small></th><td data-runs="wb.saves"><b>–</b><small>–</small></td><td data-runs="wb.doubt"><b>–</b><small>–</small></td><td data-runs="wb.points"><b>–</b><small>–</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pilot-unit">Per 100 cars: a point for each car that clears, less what its doubt cost, with the exact values for this model in small type.<span class="runs-say" hidden></span> On this road’s coarse steps my 2025 rule gives up <span data-car-n="lossPm">0.79</span> and the look-ahead rule <span data-car-n="lossWb">0.03</span>, against 0.86 and 0.038 for the smooth model in the print below. The 2025 rule’s bounds stay flat, so its car reaches the line undecided <span data-car-n="forcedPm">44</span>% of the time and must go with what it has: the bar past the line in its strip.</p>
+    <p class="pilot-fit"><b>Loose: an illustration.</b> Two sides, even odds at the start, a crash on the wrong side either way, and a last moment the car knows from its speed and distance all fit the model. What breaks: real cars fuse many sensors and plan many maneuvers, not one stream of readings, and the costs here are a story.</p>
+    <p class="pilot-fit">The story’s numbers: one time unit is one second, and the cars go 20 m/s (72 km/h), so the last moment to swerve comes 20 m after they first see the obstacle. Each reading, one every hundredth of a second, points to the clear side 55% of the time, and every second of doubt costs a tenth of a point. Space bar plays and pauses while the scene has focus.</p>
+  </div>
+  <div class="pilot pilot-lanes keeper" id="keeper" tabindex="0" aria-labelledby="gk-h" aria-describedby="gk-lede">
+    <div class="pilot-head"><h4 id="gk-h">The goalkeeper</h4><span class="fit fit-loose">Loose</span></div>
+    <p class="pilot-lede" id="gk-lede">Three keepers face the same penalty and must dive left or right. They read the same cues from the kicker’s run-up, so they differ only in their bounds: the best bounds, my 2025 rule, and the look-ahead rule. Waiting tells a keeper more, but each moment of doubt costs more than the last, since a later dive must be faster to reach the corner, and once the ball is struck no dive gets there. You can see where the kick will go; the keepers can’t. Each cue flashes on the side of the goal it points to.</p>
+    <div class="lanes-stage gk-stage">
+      <canvas class="gk-gl" aria-hidden="true"></canvas>
+      <canvas class="gk-hud" role="img" aria-label="Three goals seen from behind the penalty spots, each with a keeper and a kicker. Above each goal, a gauge shows the running total of the keeper's cues and where its bounds are now; along the bottom, the cost of a moment's doubt climbs toward the kick."></canvas>
+    </div>
+    <div class="pilot-bar">
+      <div class="actions">
+        <button type="button" class="btn" data-gk="play" aria-pressed="true">Pause</button>
+        <button type="button" class="btn btn-quiet" data-gk="step">One cue</button>
+        <button type="button" class="btn btn-quiet" data-gk="next">Next kick</button>
+        <button type="button" class="btn btn-quiet" data-gk="many">Run 1,000 kicks</button>
+      </div>
+      <p class="pilot-status gk-status" aria-live="polite"></p>
+    </div>
+    <div class="pilot-runs">
+      <div class="runs-head"><p class="runs-title">When each keeper dove</p><p class="runs-key"><span class="rk-fill"><span class="runs-n">0 kicks</span></span><span class="rk-line">exact</span></p></div>
+      <svg class="lanes runs-strip" role="img" aria-label="For each rule, how often its keeper dives at each moment of the run-up: exact for this model as a line, the kicks run so far filled in under it, and the share still in doubt at the kick as a bar past it."></svg>
+      <table class="runs-sum">
+        <thead><tr><th scope="col"><span class="visually-hidden">Rule</span></th><th scope="col">Saves</th><th scope="col">− Doubt</th><th scope="col">= Points</th></tr></thead>
+        <tbody>
+          <tr class="k-ex"><th scope="row">Best bounds<small>exact</small></th><td data-runs="ex.saves"><b>–</b><small>–</small></td><td data-runs="ex.doubt"><b>–</b><small>–</small></td><td data-runs="ex.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-pm"><th scope="row">2025 rule<small>exact</small></th><td data-runs="pm.saves"><b>–</b><small>–</small></td><td data-runs="pm.doubt"><b>–</b><small>–</small></td><td data-runs="pm.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-wb"><th scope="row">Look-ahead rule<small>exact</small></th><td data-runs="wb.saves"><b>–</b><small>–</small></td><td data-runs="wb.doubt"><b>–</b><small>–</small></td><td data-runs="wb.points"><b>–</b><small>–</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pilot-unit">Per 100 kicks: a point for each save, less what the keeper’s doubt cost, with the exact values for this model in small type.<span class="runs-say" hidden></span> On this pitch’s coarse steps my 2025 rule gives up <span data-gk-n="lossPm">1.06</span> and the look-ahead rule <span data-gk-n="lossWb">0.02</span>, against <span data-s="4.pm">1.06</span> and <span data-s="4.wb">0.063</span> for the smooth model in the print below (rounding its bounds to whole cues happens to help the look-ahead rule here). The 2025 rule’s bounds fall only as the cost rises, so its keeper is still in doubt at the kick <span data-gk-n="forcedPm">5</span>% of the time and has to guess: the bar past the line in its strip.</p>
+    <p class="pilot-fit"><b>Loose: an illustration.</b> Two sides, even odds at the start, and a dive that gets harder the later it starts all fit the model. What breaks: a keeper can stay in the middle, kickers watch the keeper and change their aim, real cues are few and not independent, and the costs here are a story.</p>
+    <p class="pilot-fit">The story’s numbers: one time unit is one second, from the start of the run-up to the kick. Each cue, one every hundredth of a second, points to the side the kick will go 55% of the time. A second of doubt costs <span data-gk-n="costStart">0.03</span> points as the run-up starts and <span data-gk-n="costKick">1</span> point at the kick, so a keeper that waits for the kick has paid a sixth of a save. Space bar plays and pauses while the scene has focus.</p>
+  </div>
+  <div class="pilot sorter" id="sorter" tabindex="0" aria-labelledby="so-h" aria-describedby="so-lede">
+    <div class="pilot-head"><h4 id="so-h">The recycling sorter</h4><span class="fit fit-fair">Fair</span></div>
+    <p class="pilot-lede" id="so-lede">Flakes of two plastics, PET and HDPE, slide down a chute past a sensor, and an air jet further on pushes each into its bin. Flakes slide at different speeds, and the sorter measures each one’s speed as it enters, so it knows how long it has before the jets: <span data-so-n="msFast">20</span> ms for the fastest, <span data-so-n="msSlow">70</span> ms for the slowest. While a flake holds the sensor, the next one waits, so every moment of doubt costs the same. Three chutes carry the same flakes, one per rule: the best bounds, my 2025 rule, and the look-ahead rule. A flake is a circle if it is PET and a square if it is HDPE; it stays hollow while its rule is still reading it and fills with its bin’s color once it has chosen.</p>
+    <div class="so-stage">
+      <canvas class="so-chutes" role="img" aria-label="Three chutes, one per rule, carrying the same flakes from the sensor to the jets, with a bin for each plastic beyond the jets. Flakes are hollow until their rule chooses a bin and filled with that bin's color after; a flake still hollow at the jets is ringed as it is pushed to the side its readings favor."></canvas>
+      <svg class="lanes so-walls" role="img" aria-label="The confidence each rule asks for, by how long a flake has had, for the four speeds: the best bounds close toward each flake's deadline, the look-ahead rule's with them, while the 2025 rule asks for the same confidence of every flake until its deadline forces the choice."></svg>
+    </div>
+    <div class="pilot-bar">
+      <div class="actions">
+        <button type="button" class="btn" data-so="play" aria-pressed="true">Pause</button>
+        <button type="button" class="btn btn-quiet" data-so="step">One reading</button>
+        <button type="button" class="btn btn-quiet" data-so="many">Run 1,000 flakes</button>
+      </div>
+      <p class="pilot-status so-status" aria-live="polite"></p>
+    </div>
+    <div class="pilot-runs">
+      <div class="runs-head"><p class="runs-title">When each flake’s bin was chosen</p><p class="runs-key"><span class="rk-fill"><span class="runs-n">0 flakes</span></span><span class="rk-line">exact</span></p></div>
+      <svg class="lanes runs-strip" role="img" aria-label="For each rule, how often it chooses a flake's bin at each moment after the flake enters, over all four speeds: exact for this model as a line, the flakes sorted so far filled in under it, and the share still undecided at the jets as a bar past the end."></svg>
+      <table class="runs-sum">
+        <thead><tr><th scope="col"><span class="visually-hidden">Rule</span></th><th scope="col">Right</th><th scope="col">− Doubt</th><th scope="col">= Points</th></tr></thead>
+        <tbody>
+          <tr class="k-ex"><th scope="row">Best bounds<small>exact</small></th><td data-runs="ex.saves"><b>–</b><small>–</small></td><td data-runs="ex.doubt"><b>–</b><small>–</small></td><td data-runs="ex.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-pm"><th scope="row">2025 rule<small>exact</small></th><td data-runs="pm.saves"><b>–</b><small>–</small></td><td data-runs="pm.doubt"><b>–</b><small>–</small></td><td data-runs="pm.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-wb"><th scope="row">Look-ahead rule<small>exact</small></th><td data-runs="wb.saves"><b>–</b><small>–</small></td><td data-runs="wb.doubt"><b>–</b><small>–</small></td><td data-runs="wb.points"><b>–</b><small>–</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pilot-unit">Per 100 flakes: a point for each flake in the right bin, less what its doubt cost, with the exact values for this model in small type.<span class="runs-say" hidden></span> Each speed is the car’s problem with its own deadline. The best bounds close by each flake’s deadline: halfway to the fastest flake’s, they ask for <span data-so-n="halfEx">77</span>% confidence, against the <span data-so-n="halfPm">86</span>% my 2025 rule asks of every flake. So the 2025 rule’s chute sends <span data-so-n="forcedPmFast">61</span>% of the fastest flakes through the jets still undecided, and <span data-so-n="forcedPmSlow">8</span>% of the slowest; it gives up <span data-so-n="lossPmFast">1.02</span> points per 100 on the fastest and <span data-so-n="lossPmSlow">0.18</span> on the slowest, <span data-so-n="lossPm">0.63</span> over all four speeds, against <span data-so-n="lossWb">0.03</span> for the look-ahead rule. Over all four, <span data-so-n="forcedPm">33</span>% of its flakes are forced at the jets: the bar past the line in its strip.</p>
+    <p class="pilot-fit"><b>Fair.</b> Two plastics, a sensor that reads all the way to the jets, a deadline known from each flake’s speed, and a steady cost fit the model. What breaks: real sorters read a few spectra in milliseconds rather than many weak readings, the two plastics are rarely half and half, and many flakes share the sensor at once.</p>
+    <p class="pilot-fit">The story’s numbers: one time unit is 50 ms, so a reading comes every half millisecond and points to the flake’s plastic 55% of the time. The jets sit 6 cm past where the sensor first sees a flake, and flakes slide at four speeds, from <span data-so-n="speedFast">3.0</span> to <span data-so-n="speedSlow">0.9</span> meters a second, equally often. Every 50 ms a flake holds the sensor costs a fifth of a point. Space bar plays and pauses while the scene has focus.</p>
+  </div>
+  <p class="scn-key" aria-hidden="true"><span class="s-ex">Best bounds</span><span class="s-pm">2025 rule</span><span class="s-wb">Look-ahead rule</span><span class="s-cost">Cost of time</span></p>
+  <div class="scn-grid">
+    <article class="scn" data-scn="3" data-at="1" data-pilot="car" data-unit="s">
+      <div class="pilot-head"><h4>A window closes</h4><span class="fit fit-loose">Loose</span></div>
+      <svg class="scn-plot" viewBox="0 0 320 156" role="img" aria-label="A hard deadline at t = 1 with a steady cost. The best bounds fall toward zero ahead of the deadline; the 2025 rule stays flat until it; the look-ahead rule falls early too."></svg>
+      <p class="scn-read" aria-live="polite"></p>
+      <p>The car’s schedule in the paper’s own model: a steady cost of 0.1 and a forced answer at t = 1, here one second. That the best bounds fall before a deadline is long known (<a href="https://proceedings.neurips.cc/paper/2007/hash/9c82c7143c102b71c593d98d96093fde-Abstract.html">Frazier and Yu 2007</a>); what’s new, to my knowledge, is how close a rule built from steady-cost bounds gets. Tap the print to move the cars to that moment.</p>
+      <p class="scn-loss">2025 rule gives up <b data-s="3.pm">0.86</b> · look-ahead <b data-s="3.wb">0.038</b></p>
+    </article>
+    <article class="scn" data-scn="4" data-at="1" data-pilot="keeper" data-unit="s">
+      <div class="pilot-head"><h4>A dive gets harder</h4><span class="fit fit-loose">Loose</span></div>
+      <svg class="scn-plot" viewBox="0 0 320 156" role="img" aria-label="The cost of doubt climbs 36-fold toward a forced choice at t = 1. The best bounds fall smoothly to zero at the deadline; the 2025 rule's bounds fall only with the cost, stay above the best bounds, and are still above zero at the deadline; the look-ahead rule follows the best bounds."></svg>
+      <p class="scn-read" aria-live="polite"></p>
+      <p>The keeper’s schedule: the cost of doubt climbs 36-fold toward a forced choice at t = 1, here one second, in the shape of a braking cost, c(t) = 0.04 / (1.2 − t)². Not one of the paper’s examples; solved with its code the same way. My 2025 rule’s bounds fall with the cost, but only as the cost rises, so they stay above the best bounds the whole way and are still above zero at the kick. Tap the print to move the keepers to that moment.</p>
+      <p class="scn-loss">2025 rule gives up <b data-s="4.pm">1.06</b> · look-ahead <b data-s="4.wb">0.063</b></p>
+    </article>
+  </div>
+</figure>
+<figure class="print scn-cat" id="scn-dearer" aria-labelledby="scn-b">
+  <header class="scn-cat-head"><span class="scn-cat-k" aria-hidden="true">B</span><h3 id="scn-b">Time gets dearer</h3><p>The best bounds start falling before the cost rises.</p></header>
+  <div class="pilot labtest" id="labtest" tabindex="0" aria-labelledby="lt-h" aria-describedby="lt-lede">
+    <div class="pilot-head"><h4 id="lt-h">The lab test of the prediction</h4><span class="fit fit-close">Close</span></div>
+    <p class="pilot-lede" id="lt-lede">Someone watches moving dots at 6.4% coherence and says which way they drift: a point for a correct answer, minus a penalty for time that climbs at a cue. The dots are drawn from the trial’s own evidence. Beside them, the urgency each rule implies (one over the height of its bounds), in milliseconds.</p>
+    <div class="lt-stage">
+      <canvas class="lt-dots" role="img" aria-label="A disk of moving dots with a fixation point, and a penalty meter that fills when the penalty climbs."></canvas>
+      <canvas class="lt-plot" role="img" aria-label="Urgency over the first 720 milliseconds: the best rule's rises from the start, the 2025 rule's only as the penalty climbs toward its halfway point at 277 milliseconds."></canvas>
+    </div>
+    <div class="pilot-bar">
+      <div class="actions">
+        <button type="button" class="btn" data-lt="play" aria-pressed="true">Pause</button>
+        <button type="button" class="btn btn-quiet" data-lt="step">Step</button>
+        <button type="button" class="btn btn-quiet" data-lt="next">Next trial</button>
+      </div>
+      <fieldset class="seg lt-observer">
+        <legend>The observer follows</legend>
+        <div class="seg-row">
+          <label><input type="radio" name="lt-obs" value="exact" checked><span>The best</span></label>
+          <label><input type="radio" name="lt-obs" value="pm"><span>The 2025 rule</span></label>
+        </div>
+      </fieldset>
+      <p class="pilot-status lt-status" aria-live="polite"></p>
+    </div>
+    <p class="pilot-find">When the dots appear, the best bounds already ask for only <span data-lab="startBest">87</span>% confidence, against <span data-lab="startPm">93</span>% for my 2025 rule, and its urgency climbs from the first moment. It reaches twice the 2025 rule’s starting urgency at <span data-lab="best2Ms">161</span> ms; the 2025 rule’s gets there at <span data-lab="pm2Ms">227</span> ms, only as the penalty itself climbs toward its midpoint at <span data-lab="cueMs">277</span> ms. A recorded urgency signal (<a href="https://elifesciences.org/articles/02260">Hanks, Kiani, and Shadlen 2014</a>) could test it. At this task’s starting cost a slow change would be led by about <span data-lab="slowMs">302</span> ms (the paper’s <span data-n="PalmerLead">217</span> ms is for the bounds Palmer’s observers actually used); a step this large and this early shows instead as urgency that is higher from the start.</p>
+    <p class="pilot-fit"><b>Close.</b> The model was made for this task. What breaks: observers would have to learn the schedule, and the paper models one decision, not a session’s rate of reward; nobody has run it on people or animals. Times are decision times, not counting the time to see and to respond; one model time unit is <span data-lab="unitMs">554</span> ms for the average observer of Palmer, Huk, and Shadlen (2005). Slowed about threefold on a 60 Hz screen.</p>
+  </div>
+  <div class="pilot pilot-lanes lander" id="lander" tabindex="0" aria-labelledby="ld-h" aria-describedby="ld-lede">
+    <div class="pilot-head"><h4 id="ld-h">The lander</h4><span class="fit fit-loose">Loose</span></div>
+    <p class="pilot-lede" id="ld-lede">Three landers hover over the same kind of site and must set down to its left or its right: one side is clear, the other strewn with boulders too small to see from that height. They take the same lidar scans, so they differ only in their bounds: the best bounds, my 2025 rule, and the look-ahead rule. Hovering is cheap while the hover fuel lasts; once the fuel reaches the reserve a lander needs to land safely, every moment costs more than the last. You can see which side is clear; the landers can’t. Each scan flashes on the side it points to.</p>
+    <div class="lanes-stage ld-stage">
+      <canvas class="ld-gl" aria-hidden="true"></canvas>
+      <canvas class="ld-hud" role="img" aria-label="Three landers hovering over three sites, each with a pad marked on either side and boulders on the side that is not clear. Above each lander, a gauge shows the running total of its scans and where its bounds are now; under it, its fuel with the reserve marked; along the bottom, the cost of a moment's doubt, flat until the reserve and climbing after."></canvas>
+    </div>
+    <div class="pilot-bar">
+      <div class="actions">
+        <button type="button" class="btn" data-ld="play" aria-pressed="true">Pause</button>
+        <button type="button" class="btn btn-quiet" data-ld="step">One scan</button>
+        <button type="button" class="btn btn-quiet" data-ld="next">Next landing</button>
+        <button type="button" class="btn btn-quiet" data-ld="many">Run 1,000 landings</button>
+      </div>
+      <p class="pilot-status ld-status" aria-live="polite"></p>
+    </div>
+    <div class="pilot-runs">
+      <div class="runs-head"><p class="runs-title">When each lander chose a side</p><p class="runs-key"><span class="rk-fill"><span class="runs-n">0 landings</span></span><span class="rk-line">exact</span></p></div>
+      <svg class="lanes runs-strip" role="img" aria-label="For each rule, how often its lander chooses a side at each moment of the hover until the fuel runs out: exact for this model as a line, and the landings run so far filled in under it."></svg>
+      <table class="runs-sum">
+        <thead><tr><th scope="col"><span class="visually-hidden">Rule</span></th><th scope="col">Clear</th><th scope="col">− Doubt</th><th scope="col">= Points</th></tr></thead>
+        <tbody>
+          <tr class="k-ex"><th scope="row">Best bounds<small>exact</small></th><td data-runs="ex.saves"><b>–</b><small>–</small></td><td data-runs="ex.doubt"><b>–</b><small>–</small></td><td data-runs="ex.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-pm"><th scope="row">2025 rule<small>exact</small></th><td data-runs="pm.saves"><b>–</b><small>–</small></td><td data-runs="pm.doubt"><b>–</b><small>–</small></td><td data-runs="pm.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-wb"><th scope="row">Look-ahead rule<small>exact</small></th><td data-runs="wb.saves"><b>–</b><small>–</small></td><td data-runs="wb.doubt"><b>–</b><small>–</small></td><td data-runs="wb.points"><b>–</b><small>–</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pilot-unit">Per 100 landings: a point for each lander that sets down clear, less what its doubt cost, with the exact values for this model in small type.<span class="runs-say" hidden></span> On this ground’s coarse steps my 2025 rule gives up <span data-ld-n="lossPm">0.60</span> and the look-ahead rule <span data-ld-n="lossWb">0.01</span>, against <span data-s="2.pm">0.68</span> and <span data-s="2.wb">0.012</span> for the smooth model in the print below. The best bounds start falling before the fuel reaches its reserve, <span data-ld-n="reserveS">5</span> seconds in, so <span data-ld-n="byReserveEx">45</span>% of the best bounds’ landers have chosen by then, against <span data-ld-n="byReservePm">21</span>% of the 2025 rule’s, whose bounds hold until the cost itself climbs. The 2025 rule’s landers wait longer, <span data-ld-n="waitPm">6.6</span> seconds on average against <span data-ld-n="waitEx">5.4</span>, and set down clear a little more often, <span data-ld-n="clearPm">84</span>% against <span data-ld-n="clearEx">82</span>%, but the waiting costs them more than the extra clear landings earn.</p>
+    <p class="pilot-fit"><b>Loose: an illustration.</b> Two sides, even odds at the start, and hovering that costs more once the fuel reaches a reserve the lander knows in advance fit the model. What breaks: real landers rank many sites, not two, steer while they look, and read the ground from whole images rather than one noisy scan at a time; the costs here are a story.</p>
+    <p class="pilot-fit">The story’s numbers: one time unit is ten seconds. Each lidar scan, ten a second, points to the clear side 55% of the time. Ten seconds of hovering costs <span data-ld-n="costLow">0.1</span> points until the fuel reaches its reserve; after that the price climbs steadily, to <span data-ld-n="costAt15">0.9</span> points per ten seconds by 15 seconds in: the paper’s “flat, then climbing” schedule in the print below. The fuel would run out at 25 seconds, but every lander here has chosen long before. Space bar plays and pauses while the scene has focus.</p>
+  </div>
+  <p class="scn-key" aria-hidden="true"><span class="s-ex">Best bounds</span><span class="s-pm">2025 rule</span><span class="s-wb">Look-ahead rule</span><span class="s-cost">Cost of time</span></p>
+  <div class="scn-grid">
+    <article class="scn" data-scn="0" data-at="0.5" data-pilot="lab" data-unit="ms">
+      <div class="pilot-head"><h4>A rush at a known time</h4><span class="fit fit-close">Close</span></div>
+      <svg class="scn-plot" viewBox="0 0 320 156" role="img" aria-label="Cost of time jumps 16-fold at t = 0.5. The best bounds start falling well before the jump; the 2025 rule drops only at the jump; the look-ahead rule follows the best bounds."></svg>
+      <p class="scn-read" aria-live="polite"></p>
+      <p>The lab test’s schedule: time is about to get 16 times more expensive. The best bounds start dropping before the jump; the 2025 rule waits for it. Tap the print to mark that moment on the urgency plot.</p>
+      <p class="scn-loss">2025 rule gives up <b data-s="0.pm">0.94</b> · look-ahead <b data-s="0.wb">0.010</b></p>
+    </article>
+    <article class="scn" data-scn="2" data-at="0.5" data-pilot="lander" data-unit="s" data-per="10">
+      <div class="pilot-head"><h4>Patience runs out</h4><span class="fit fit-fair">Fair</span></div>
+      <svg class="scn-plot" viewBox="0 0 320 156" role="img" aria-label="Cost of time is flat, then climbs steadily after t = 0.5. The best bounds start falling before the climb; the 2025 rule follows the cost; the look-ahead rule follows the best bounds."></svg>
+      <p class="scn-read" aria-live="polite"></p>
+      <p>Flat, then climbing: the shape <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3329788">Drugowitsch and colleagues (2012)</a> inferred from monkeys and people. What breaks: their task mixed easy and hard trials at random, so their observers didn’t know the evidence’s strength, as this model does; the shape echoes their fit, and the numbers are the paper’s model, not their data. The lander above runs on this schedule, one time unit to ten seconds; tap the print to move the landers to that moment.</p>
+      <p class="scn-loss">2025 rule gives up <b data-s="2.pm">0.68</b> · look-ahead <b data-s="2.wb">0.012</b></p>
+    </article>
+  </div>
+</figure>
+<figure class="print scn-cat" id="scn-cheaper" aria-labelledby="scn-c">
+  <header class="scn-cat-head"><span class="scn-cat-k" aria-hidden="true">C</span><h3 id="scn-c">Time gets cheaper</h3><p>The best bounds rise before the pressure lifts. Of the paper’s four solved examples, this is where my 2025 rule loses most.</p></header>
+  <div class="pilot pilot-lanes recorder" id="recorder" tabindex="0" aria-labelledby="rc-h" aria-describedby="rc-lede">
+    <div class="pilot-head"><h4 id="rc-h">The solar field recorder</h4><span class="fit fit-loose">Loose</span></div>
+    <p class="pilot-lede" id="rc-lede">Three recorders on posts listen to the same flycatcher at first light and must log it as an alder or a willow flycatcher, two birds that look alike and are told apart by song. They hear the same songs, so they differ only in their bounds: the best bounds, my 2025 rule, and the look-ahead rule. Until the sun clears the ridge, listening runs a recorder on its battery; once its panel is in sun, listening costs almost nothing. The page tells you which bird it is; the recorders only hear it. Each song flashes by the sign of the species it sounds like.</p>
+    <div class="lanes-stage rc-stage">
+      <canvas class="rc-gl" aria-hidden="true"></canvas>
+      <canvas class="rc-hud" role="img" aria-label="Three recorders on posts seen from behind, each facing a flycatcher on a perch with a sign for each species on either side, and a ridge with the sun coming up behind it. Above each recorder, a gauge shows the running total of its songs and where its bounds are now; under it, the battery its doubt has used; along the bottom, the cost of a moment's doubt, falling as the sun comes up."></canvas>
+    </div>
+    <div class="pilot-bar">
+      <div class="actions">
+        <button type="button" class="btn" data-rc="play" aria-pressed="true">Pause</button>
+        <button type="button" class="btn btn-quiet" data-rc="step">One song</button>
+        <button type="button" class="btn btn-quiet" data-rc="next">Next bird</button>
+        <button type="button" class="btn btn-quiet" data-rc="many">Run 1,000 birds</button>
+      </div>
+      <p class="pilot-status rc-status" aria-live="polite"></p>
+    </div>
+    <div class="pilot-runs">
+      <div class="runs-head"><p class="runs-title">When each recorder named the bird</p><p class="runs-key"><span class="rk-fill"><span class="runs-n">0 birds</span></span><span class="rk-line">exact</span></p></div>
+      <svg class="lanes runs-strip" role="img" aria-label="For each rule, how often its recorder logs the bird at each moment from the first song until the bird stops singing: exact for this model as a line, the birds run so far filled in under it, and the share still in doubt when the bird stops as a bar past it."></svg>
+      <table class="runs-sum">
+        <thead><tr><th scope="col"><span class="visually-hidden">Rule</span></th><th scope="col">Right</th><th scope="col">− Doubt</th><th scope="col">= Points</th></tr></thead>
+        <tbody>
+          <tr class="k-ex"><th scope="row">Best bounds<small>exact</small></th><td data-runs="ex.saves"><b>–</b><small>–</small></td><td data-runs="ex.doubt"><b>–</b><small>–</small></td><td data-runs="ex.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-pm"><th scope="row">2025 rule<small>exact</small></th><td data-runs="pm.saves"><b>–</b><small>–</small></td><td data-runs="pm.doubt"><b>–</b><small>–</small></td><td data-runs="pm.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-wb"><th scope="row">Look-ahead rule<small>exact</small></th><td data-runs="wb.saves"><b>–</b><small>–</small></td><td data-runs="wb.doubt"><b>–</b><small>–</small></td><td data-runs="wb.points"><b>–</b><small>–</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pilot-unit">Per 100 birds: a point for each bird named right, less what the recorder’s listening cost, with the exact values for this model in small type.<span class="runs-say" hidden></span> On this meadow’s coarse steps my 2025 rule gives up <span data-rc-n="lossPm">4.87</span> and the look-ahead rule <span data-rc-n="lossWb">0.09</span>, against <span data-s="6.pm">5.31</span> and <span data-s="6.wb">0.067</span> for the smooth model in the print below. The 2025 rule sets its bounds for the cost of the moment, and in the dark that cost is high, so <span data-rc-n="earlyPm">72</span>% of its recorders have logged the bird by the time the sun is halfway up, <span data-rc-n="halfUp">3.5</span> minutes in, against <span data-rc-n="earlyEx">16</span>% for the best bounds, which wait for the cheap listening ahead. Its recorders name the right species <span data-rc-n="rightPm">79</span>% of the time, against <span data-rc-n="rightEx">93</span>%, after <span data-rc-n="waitPm">5.6</span> minutes on average, against <span data-rc-n="waitEx">12.5</span>. Its recorder is still in doubt when the bird stops <span data-rc-n="forcedPm">3</span>% of the time and must go with what it has: the bar past the line in its strip.</p>
+    <p class="pilot-fit"><b>Loose: an illustration.</b> Two species, even odds at the start, and listening that gets cheaper at a time the recorder knows in advance fit the model. What breaks: real recorders sort many species, often later and off the device; songs are not independent readings; and the costs here are a story.</p>
+    <p class="pilot-fit">The story’s numbers: one time unit is ten minutes, so each song comes six seconds after the last. Each song sounds like the right species 55% of the time. Ten minutes of listening costs <span data-rc-n="costHigh">0.5</span> points on the battery and <span data-rc-n="costLow">0.05</span> once the panel is in full sun, between <span data-rc-n="dawnFrom">1</span> and <span data-rc-n="dawnTo">6</span> minutes after the first song. The bird stops singing after 30 minutes. Space bar plays and pauses while the scene has focus.</p>
+  </div>
+  <div class="pilot labtest" id="labtest-lift" tabindex="0" aria-labelledby="ltl-h" aria-describedby="ltl-lede">
+    <div class="pilot-head"><h4 id="ltl-h">The lab test, with the pressure lifting</h4><span class="fit fit-close">Close</span></div>
+    <p class="pilot-lede" id="ltl-lede">The same task with the penalty turned around: it starts high and falls eightfold at a cue, from <span data-lift="penaltyHigh">0.72</span> to <span data-lift="penaltyLow">0.09</span> points a second. The best bounds are high from the start, since time is about to get cheap; my 2025 rule’s stay low until the penalty drops. Of the paper’s four solved examples, this is where the 2025 rule loses most.</p>
+    <div class="lt-stage">
+      <canvas class="lt-dots" role="img" aria-label="A disk of moving dots with a fixation point, and a penalty meter that empties when the penalty falls."></canvas>
+      <canvas class="lt-plot" role="img" aria-label="Urgency over the first 720 milliseconds: the best rule's is low from the start and falls early; the 2025 rule's stays high until the penalty falls past its halfway point at 166 milliseconds."></canvas>
+    </div>
+    <div class="pilot-bar">
+      <div class="actions">
+        <button type="button" class="btn" data-lt="play" aria-pressed="true">Pause</button>
+        <button type="button" class="btn btn-quiet" data-lt="step">Step</button>
+        <button type="button" class="btn btn-quiet" data-lt="next">Next trial</button>
+      </div>
+      <fieldset class="seg lt-observer">
+        <legend>The observer follows</legend>
+        <div class="seg-row">
+          <label><input type="radio" name="ltl-obs" value="exact" checked><span>The best</span></label>
+          <label><input type="radio" name="ltl-obs" value="pm"><span>The 2025 rule</span></label>
+        </div>
+      </fieldset>
+      <p class="pilot-status lt-status" aria-live="polite"></p>
+    </div>
+    <p class="pilot-find">When the dots appear, the best bounds already ask for <span data-lift="startBest">86</span>% confidence, against <span data-lift="startPm">75</span>% for my 2025 rule, so its urgency starts at <span data-lift="startRatio">0.59</span> of the 2025 rule’s. It falls to half the 2025 rule’s starting urgency at <span data-lift="bestHalfMs">77</span> ms; the 2025 rule’s gets there at <span data-lift="pmHalfMs">192</span> ms, only after the penalty itself has fallen past its midpoint at <span data-lift="cueMs">166</span> ms. The same recorded urgency signal could test this direction too: urgency that falls before a known drop in the penalty, not after it.</p>
+    <p class="pilot-fit"><b>Close.</b> As for the lab test above: the model was made for this task, observers would have to learn the schedule, and nobody has run it on people or animals. One model time unit is <span data-lift="unitMs">554</span> ms. Slowed about threefold on a 60 Hz screen.</p>
+  </div>
+  <p class="scn-key" aria-hidden="true"><span class="s-ex">Best bounds</span><span class="s-pm">2025 rule</span><span class="s-wb">Look-ahead rule</span><span class="s-cost">Cost of time</span></p>
+  <div class="scn-grid">
+    <article class="scn" data-scn="1" data-at="0.3" data-pilot="lab-lift" data-unit="ms">
+      <div class="pilot-head"><h4>The pressure lifts</h4><span class="fit fit-close">Close</span></div>
+      <svg class="scn-plot" viewBox="0 0 320 156" role="img" aria-label="Cost of time falls from 0.4 to 0.05 at t = 0.3. The best bounds are already high before the drop; the 2025 rule’s stay low until the drop; the look-ahead rule follows the best bounds."></svg>
+      <p class="scn-read" aria-live="polite"></p>
+      <p>The lab task, with the penalty lifting at a cue. Time is about to get cheap, so the best bounds are already high; the 2025 rule’s stay low until the drop, its worst case of the four. What breaks: observers would have to learn the schedule; untested. Tap the print to mark that moment on the lab test’s urgency plot above.</p>
+      <p class="scn-loss">2025 rule gives up <b data-s="1.pm">4.29</b> · look-ahead <b data-s="1.wb">0.008</b></p>
+    </article>
+    <article class="scn" data-scn="6" data-at="0.35" data-pilot="recorder" data-unit="min" data-per="10">
+      <div class="pilot-head"><h4>Listening gets cheaper at sunrise</h4><span class="fit fit-loose">Loose</span></div>
+      <svg class="scn-plot" viewBox="0 0 320 156" role="img" aria-label="The cost of listening falls tenfold as the sun comes up, between t = 0.1 and 0.6, with a forced choice at t = 3. The best bounds rise from the start, before the cost falls; the 2025 rule's bounds stay low until the cost falls; the look-ahead rule follows the best bounds. Near the end the best bounds fall to meet the forced choice."></svg>
+      <p class="scn-read" aria-live="polite"></p>
+      <p>The recorder’s schedule: listening costs ten times less once the sun is up, falling smoothly between t = 0.1 and 0.6, here one and six minutes after the first song, with a forced choice at t = 3, when the bird stops. Not one of the paper’s examples; solved with its code the same way. The best bounds start rising before the cost starts falling: in the dark it asks for <span data-rc-print="startEx">81</span>% confidence, against <span data-rc-print="startPm">71</span>% for my 2025 rule, which waits for the light. Near the end the best bounds fall again, as the bird is about to stop. Tap the print to move the recorders to that moment.</p>
+      <p class="scn-loss">2025 rule gives up <b data-s="6.pm">5.31</b> · look-ahead <b data-s="6.wb">0.067</b></p>
+    </article>
+  </div>
+</figure>
+<figure class="print scn-cat" id="scn-steady" aria-labelledby="scn-d">
+  <header class="scn-cat-head"><span class="scn-cat-k" aria-hidden="true">D</span><h3 id="scn-d">Steady or rhythmic</h3><p>A steady cost is my 2025 rule’s home ground: there its bounds are the best bounds. A cost that rises and falls shows the lead: the best bounds move before the cost does, and by less.</p></header>
+  <div class="pilot pilot-lanes robot" id="robot" tabindex="0" aria-labelledby="rb-h" aria-describedby="rb-lede">
+    <div class="pilot-head"><h4 id="rb-h">The walking robot</h4><span class="fit fit-loose">Loose</span></div>
+    <p class="pilot-lede" id="rb-lede">Three robots walk toward the same kind of rock and must step around it on the left or the right: the ground is firm on one side and loose scree on the other. They take the same noisy sensor readings, so they differ only in their bounds: the best bounds, my 2025 rule, and the look-ahead rule. Doubt costs a walking robot most as each foot comes down, since a foot planted before it has chosen a side must land short and square; while the leg swings, waiting costs little. You can see which side is firm; the robots can’t. Each reading flashes on the side of the rock it points to.</p>
+    <div class="lanes-stage rb-stage">
+      <canvas class="rb-gl" aria-hidden="true"></canvas>
+      <canvas class="rb-hud" role="img" aria-label="Three lanes seen from behind three walking robots, each with a rock ahead and loose scree on the side that is not firm. Above each robot, a gauge shows the running total of its readings and where its bounds are now; along the bottom, the cost of a moment's doubt rises and falls with each step."></canvas>
+    </div>
+    <div class="pilot-bar">
+      <div class="actions">
+        <button type="button" class="btn" data-rb="play" aria-pressed="true">Pause</button>
+        <button type="button" class="btn btn-quiet" data-rb="step">One reading</button>
+        <button type="button" class="btn btn-quiet" data-rb="next">Next rock</button>
+        <button type="button" class="btn btn-quiet" data-rb="many">Run 1,000 rocks</button>
+      </div>
+      <fieldset class="seg rb-cost">
+        <legend>A moment of doubt costs</legend>
+        <div class="seg-row">
+          <label><input type="radio" name="rb-cost" value="step" checked><span>Most at each footfall</span></label>
+          <label><input type="radio" name="rb-cost" value="steady"><span>The same throughout</span></label>
+        </div>
+      </fieldset>
+      <p class="pilot-status rb-status" aria-live="polite"></p>
+    </div>
+    <div class="pilot-runs">
+      <div class="runs-head"><p class="runs-title">When each robot chose a side</p><p class="runs-key"><span class="rk-fill"><span class="runs-n">0 rocks</span></span><span class="rk-line">exact</span></p></div>
+      <svg class="lanes runs-strip" role="img" aria-label="For each rule, how often its robot chooses a side at each moment from first sight of the rock to the last step to choose: exact for this model as a line, the rocks run so far filled in under it, and the share still undecided at the last step as a bar past it."></svg>
+      <table class="runs-sum">
+        <thead><tr><th scope="col"><span class="visually-hidden">Rule</span></th><th scope="col">Firm</th><th scope="col">− Doubt</th><th scope="col">= Points</th></tr></thead>
+        <tbody>
+          <tr class="k-ex"><th scope="row">Best bounds<small>exact</small></th><td data-runs="ex.saves"><b>–</b><small>–</small></td><td data-runs="ex.doubt"><b>–</b><small>–</small></td><td data-runs="ex.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-pm"><th scope="row">2025 rule<small>exact</small></th><td data-runs="pm.saves"><b>–</b><small>–</small></td><td data-runs="pm.doubt"><b>–</b><small>–</small></td><td data-runs="pm.points"><b>–</b><small>–</small></td></tr>
+          <tr class="k-wb"><th scope="row">Look-ahead rule<small>exact</small></th><td data-runs="wb.saves"><b>–</b><small>–</small></td><td data-runs="wb.doubt"><b>–</b><small>–</small></td><td data-runs="wb.points"><b>–</b><small>–</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="pilot-unit">Per 100 rocks: a point for each robot that passes on firm ground, less what its doubt cost, with the exact values for this model in small type.<span class="runs-say" hidden></span> With the cost peaking at each footfall, my 2025 rule gives up <span data-rb-n="lossPm">0.96</span> and the look-ahead rule <span data-rb-n="lossWb">0.16</span> on this ground’s coarse steps, against <span data-s="5.pm">0.90</span> and <span data-s="5.wb">0.127</span> for the smooth model in the print below. The 2025 rule’s bounds rise and fall with the cost, more than three times as far as the best bounds, so its robot often commits just as a foot comes down, on less evidence: half its choices fall in the last tenth of a second before a footfall, against a third for the best bounds, and it waits <span data-rb-n="waitPm">0.49</span> s on average, against <span data-rb-n="waitEx">0.66</span> s. The best bounds move less and sooner: they are lowest a little before each footfall, the lead the paper predicts for a cost that rises and falls (<a href="#wave">below</a>). Make the cost the same throughout and the 2025 rule’s bounds are the best bounds until the rock is near: the three robots choose alike on at least <span data-rb-n="flatSame">98</span> rocks in 100, and the 2025 rule gives up <span data-rb-n="flatPm">0.01</span>.</p>
+    <p class="pilot-fit"><b>Loose: an illustration.</b> Two sides, even odds at the start, and a cost of doubt that rises and falls with each step fit the model. What breaks: a real robot weighs many footholds, not two, changes its gait as it goes, and can often see the ground well enough not to need many readings; the costs here are a story.</p>
+    <p class="pilot-fit">The story’s numbers: one time unit is one second. The robots walk at 1.2 m/s, a step every <span data-rb-n="perStep">0.5</span> s, and first see the rock three seconds before their last step to choose a side. Each reading, one every hundredth of a second, points to the firm side 55% of the time. A second of doubt costs <span data-rb-n="costLow">0.04</span> points between footfalls and <span data-rb-n="costHigh">0.36</span> as a foot comes down, <span data-rb-n="costMean">0.2</span> on average. Space bar plays and pauses while the scene has focus.</p>
+  </div>
+  <p class="scn-key" aria-hidden="true"><span class="s-ex">Best bounds</span><span class="s-pm">2025 rule</span><span class="s-wb">Look-ahead rule</span><span class="s-cost">Cost of time</span></p>
+  <div class="scn-grid">
+    <article class="scn" data-scn="5" data-at="0.25" data-every="0.5" data-pilot="robot" data-unit="s">
+      <div class="pilot-head"><h4>Doubt peaks at each step</h4><span class="fit fit-loose">Loose</span></div>
+      <svg class="scn-plot" viewBox="0 0 320 156" role="img" aria-label="The cost of doubt rises and falls with each step, peaking at every footfall (dotted lines), every half second up to a forced choice at t = 3. The 2025 rule's bounds fall and rise with the cost; the best bounds swing less than a third as far and are lowest a little before each footfall; the look-ahead rule follows the best bounds."></svg>
+      <p class="scn-read" aria-live="polite"></p>
+      <p>The robot’s schedule: the cost of doubt swings ninefold with each step and peaks at every footfall, c(t) = 0.2 (1 + 0.8 cos 4π(t − 0.25)), with a forced choice at t = 3, here three seconds. Not one of the paper’s examples; solved with its code the same way. My 2025 rule’s bounds move with the cost. The best bounds move less than a third as far and are lowest about <span data-rb-print="lead">35</span>° of a step’s cycle, a tenth of a step, before each footfall. Tap the print to move the robots to that moment.</p>
+      <p class="scn-loss">2025 rule gives up <b data-s="5.pm">0.90</b> · look-ahead <b data-s="5.wb">0.127</b></p>
+    </article>
+  </div>
+  <figcaption class="print-cap"><span>Hand-picked examples from the paper, and the goalkeeper’s, the robot’s, and the recorder’s schedules solved the same way; losses in points per 100 decisions against the best bounds. Across <span data-n="HeldCount">210</span> held-out schedules the 2025 rule gave up a median of <span data-n="HeldPerMomentMedian">0.13</span> points per 100 (<span data-n="HeldShareMedian">0.16</span>% of the reward), worth about one correct answer in 780 decisions, and at most <span data-n="HeldPerMomentMax">4.67</span> (<span data-n="HeldShareMax">6.0</span>%). Model observer throughout: two choices, evidence of known strength, a cost schedule known in advance. Time in units of σ²/μ² (in milliseconds for the lab task, at 6.4% coherence; in seconds for the car’s, the keeper’s, the robot’s, and the lander’s stories, ten to a time unit for the lander; in minutes for the recorder’s); bounds as the confidence they ask for; cost on a log scale. Hover over a print, or drag along it, to read it at any moment.</span></figcaption>
+</figure>
+<section class="col" aria-labelledby="h-value">
+  <div data-block="value-uses">
+    <h3>A prediction about brains</h3>
+    <p>The most promising use. If people and animals set their urgency close to the best bounds for a cost they have learned, their urgency should start rising before a known change in the cost of time, not when it arrives. For a slow change, the lead is about <span data-n="PalmerLead">217</span> ms for the average observer in the moving-dot study at 6.4% coherence; for a cost that swings once a second, about <span data-n="PalmerLeadMsOneHz">103</span> ms; and for faster swings, close to an eighth of a cycle. A rule that reacts to the present cost, like my 2025 one, predicts no lead at all. Choices and response times differ too, but by amounts that change in size and sign from schedule to schedule, so a recorded urgency signal (<a href="https://elifesciences.org/articles/02260">Hanks, Kiani, and Shadlen 2014</a>) is the more direct test. To my knowledge, nobody has run it, and whether brains use collapsing bounds at all is still debated (<a href="https://pubmed.ncbi.nlm.nih.gov/25673842/">Hawkins and colleagues 2015</a>). That the best bounds anticipate a known change was already known (<a href="https://elifesciences.org/articles/79824">Barendregt and colleagues 2022</a>); the paper adds, to my knowledge for the first time, how far ahead, in closed form.</p>
+    <h3>Machines that decide on a clock</h3>
+    <p>Plausible, and small. A sensor deciding whether a target is there before its window closes, or a classifier that must answer within a latency budget. When the cost of waiting changes on a known schedule within about one decision’s time, the look-ahead rule recovers most of what my 2025 rule gives up (a median of <span data-n="HeldRecoveredMedian">98.3</span>% on the <span data-n="HeldRecoveredCount">180</span> held-out schedules where my 2025 rule loses at least 0.01 points), but what it gives up is usually small. If you can solve the problem exactly, do: on this code, the exact solution takes about as long, under two seconds per schedule. To my knowledge, nobody has tried the rule in a real system.</p>
+    <h3>Where it doesn’t fit</h3>
+    <p>Costs that change much more slowly than a decision gain nothing: hourly prices don’t matter to a choice made in half a second. Real triage and queues don’t fit the model: their costs are random or set by policy, and their stakes are lopsided. Real driving fits only loosely, since cars fuse many sensors and plan many maneuvers, so the car at the top of the page, like the car above, is an illustration, not an application. The rule assumes two choices and a cost schedule known in advance; with evidence of unknown strength it has been checked only numerically, on a few schedules (below).</p>
+  </div>
+</section>
+<section class="col" id="glimpse" aria-labelledby="h-glimpse">
+  <h2 id="h-glimpse">One glimpse at a time</h2>
+  <div data-block="glimpse">
+    <p>Each peg on the machine stands for one glimpse of evidence. In a lab, the glimpses are frames of moving dots; here they are the same kind of evidence drawn as dots, in seconds this time, with the drift and noise of that study’s average observer.</p>
+  </div>
+</section>
+<!-- The print: one decision at a time, the dots and the evidence on one clock. -->
+<figure class="print race" id="race" aria-labelledby="race-cap">
+  <div class="race-top">
+    <div class="aperture">
+      <canvas id="dots" role="img" aria-label="Moving dots: in each frame, the dots stepping right minus the dots stepping left is the evidence the trace below adds"></canvas>
+      <p class="tag">The evidence, as dots</p>
+    </div>
+    <div class="reading" aria-live="polite" aria-atomic="true">
+      <div class="r-row"><span class="r-key">Trial</span><span class="r-val" id="r-trial">–</span></div>
+      <div class="r-row"><span class="r-key">Clock</span><span class="r-val r-clock" id="r-clock">0.000 s</span></div>
+      <div class="r-row"><span class="r-key">Belief</span><span class="r-val" id="r-lean">–</span></div>
+      <div class="r-row r-result"><span class="r-key">Decision</span><span class="r-val" id="r-choice">–</span></div>
+    </div>
+  </div>
+  <div class="strip-wrap">
+    <canvas class="strip" id="strip" role="img" aria-label="Evidence for right, in log odds, over time in each trial, with the bounds you set, the best bounds for this cost, and each frame’s net dot motion beneath"></canvas>
+  </div>
+  <div class="deck" id="race-deck">
+    <div class="actions">
+      <button type="button" class="btn btn-go" id="run-one">Run one</button>
+      <button type="button" class="btn" id="run-many">Run 200</button>
+      <button type="button" class="btn" id="use-best">Use the best bounds</button>
+      <button type="button" class="btn btn-quiet" id="tint" aria-pressed="false"><span class="swatch" aria-hidden="true"><i></i><i></i></span>Color the steps</button>
+    </div>
+    <fieldset class="seg" id="coh">
+      <legend>Motion strength</legend>
+    </fieldset>
+    <div class="dials">
+      <label class="dial"><span class="dial-key">Your bounds</span><output id="bound-out" for="bound"></output><input type="range" id="bound" min="0" max="1000" value="560" aria-describedby="bound-help"></label>
+      <label class="dial"><span class="dial-key">Cost of time</span><output id="cost-out" for="cost"></output><input type="range" id="cost" min="0" max="100" value="38"></label>
+    </div>
+    <p class="help" id="bound-help">Drag the <span data-color-word="accent">orange</span> bound on the strip, or use the slider.</p>
+    <dl class="tally" id="tally">
+      <div><dt>Decisions</dt><dd id="t-n">0</dd></div>
+      <div><dt>Correct</dt><dd><span id="t-p">–</span><small id="t-pe"></small></dd></div>
+      <div><dt>Mean time</dt><dd><span id="t-t">–</span><small id="t-te"></small></dd></div>
+      <div><dt>Points per 100</dt><dd><span id="t-r">–</span><small id="t-re"></small></dd></div>
+    </dl>
+  </div>
+  <figcaption id="race-cap" class="print-cap">
+    <span>Seconds and log odds. Measured, then expected from the closed form in small type. Single trials play at <span id="race-speed">–</span>; Run 200 fast-forwards. Trials from seed <span id="race-seed">–</span>.</span>
+  </figcaption>
+</figure>
+
+<div class="col" id="read">
+  <div data-block="how-to-read">
+    <p>Each trial, the dots drift left or right, and the evidence for “right” adds up on the strip as a noisy line. When the line reaches one of your bounds, the decision is made. High bounds are slow and accurate; low ones are fast and sloppy.</p>
+    <p>What you see is the evidence itself. In every frame, the dots stepping right minus the dots stepping left is exactly what the line adds, to the nearest dot; the bars under the line show it frame by frame. Turn on <em>Color the steps</em> to see which dots carry it. At 6.4% motion strength a single frame favors the right side only slightly more often than the wrong one, which is why the line moves up and down so much before it reaches a bound.</p>
+  </div>
+
+  <aside class="note" data-block="units-note">A correct choice earns 1 point and every second spent deciding costs the amount you set. Evidence grows with motion strength at 21 per second per unit of coherence, the average observer in Palmer, Huk, and Shadlen (2005); the noise has a variance of 1 per second. In a lab, part of that noise is in the observer rather than on the screen; here all of it is drawn as dots, so the screen shows everything the observer has. That’s also why the motion strength sets how fast the evidence drifts, not the share of dots on screen that move together.</aside>
+</div>
+
+<section class="col" id="trade-off" aria-labelledby="h-trade-off">
+  <h2 id="h-trade-off">The trade-off</h2>
+  <div data-block="trade-off">
+    <p>Try a few places for the bounds and watch the expected points in the tally: they peak at one place and fall off on both sides. Too low and you pay in mistakes; too high and you pay in time. Your measured points wander around the expected ones; a few hundred decisions isn’t many.</p>
+    <p>For a cost that stays the same, the best bounds have a closed form. With evidence strength <var>μ</var> and the noise scaled to 1, it solves</p>
+  </div>
+  <div class="eq"><span>sinh(2<i>μb</i>) + 2<i>μb</i> = <i>μ</i><sup>2</sup> / <i>c</i></span><span class="eqn">(1)</span></div>
+  <div data-block="closed-form">
+    <p>so expensive time means low bounds, and stronger evidence means waiting for more certainty; once the evidence is strong relative to the cost, the wait also gets shorter. I’ll write <i>B</i>(<i>c</i>) for where this puts the bounds at strength 1.</p>
+  </div>
+</section>
+
+<section class="col" id="changing" aria-labelledby="h-changing">
+  <h2 id="h-changing">When the cost of time changes</h2>
+  <div data-block="changing-1">
+    <p>Plenty of decisions get more expensive while you make them: a reward that shrinks, a deadline, an obstacle getting closer. With a cost <i>c</i>(<i>t</i>) that changes over time, the best bounds change too. Finding it exactly takes dynamic programming: start at the end and work backward, comparing what stopping is worth with what waiting is worth, at every moment and every level of evidence.</p>
+    <p>My 2025 capstone used a simpler rule instead: at every moment, the bounds that would be best if the current cost lasted forever.</p>
+  </div>
+  <div class="eq"><span><i>b</i>(<i>t</i>) = <i>B</i>(<i>c</i>(<i>t</i>))</span><span class="eqn">(2)</span></div>
+  <div data-block="changing-2">
+    <p><span class="key key-pm">My 2025 rule</span> needs only the present cost, so it can’t see a change coming. The <span class="key key-wb">look-ahead rule</span> averages the same bounds over the near future, with weights <i>w</i>(<i>s</i>) that come from the model itself:</p>
+  </div>
+  <div class="eq"><span><i>b</i>(<i>t</i>) = ∫<sub>0</sub><sup>∞</sup> <i>w</i>(<i>s</i>) <i>B</i>(<i>c</i>(<i>t</i> + <i>s</i>)) d<i>s</i></span><span class="eqn">(3)</span></div>
+  <div data-block="changing-3">
+    <p>Pick a schedule, or draw your own. Everything below is computed in your browser: the <span class="key key-ex">best bounds</span> by dynamic programming, both rules, and the reward each rule gives up, scored without sampling on a coarse grid. Then slide the line along the time scale. The shading ahead of it follows <i>w</i>(<i>s</i>), the stretch of the future the bounds at that moment pay attention to: it starts dark and fades as the share of the weight still to come runs out, and the tick marks where half of it has passed.</p>
+  </div>
+</section>
+
+<figure class="print lab" id="lab" aria-labelledby="lab-cap">
+  <div class="lab-head">
+    <fieldset class="seg seg-wrap" id="presets"><legend>Cost schedule</legend></fieldset>
+    <div class="dials" id="preset-dials"></div>
+  </div>
+  <div class="lab-plot">
+    <svg class="lanes" id="lab-svg" role="img" aria-labelledby="lab-desc"><desc id="lab-desc">The cost of time on top, on a log scale; beneath it, the best bounds, my 2025 rule’s, and the look-ahead rule’s, as the confidence each asks for before deciding; a movable line marks one moment and the look-ahead weights from it.</desc></svg>
+    <p class="busy" id="lab-busy" hidden>Solving the dynamic program…</p>
+  </div>
+  <div class="lab-read" aria-live="polite">
+    <dl class="at-line" id="at-line">
+      <div><dt>At <i>t</i> =</dt><dd id="al-t">–</dd></div>
+      <div><dt>Cost</dt><dd id="al-c">–</dd></div>
+      <div class="k-ex"><dt>Exact</dt><dd id="al-ex">–</dd></div>
+      <div class="k-pm"><dt>My 2025 rule</dt><dd id="al-pm">–</dd></div>
+      <div class="k-wb"><dt>Look-ahead rule</dt><dd id="al-wb">–</dd></div>
+    </dl>
+    <dl class="losses">
+      <div><dt>My 2025 rule gives up</dt><dd id="loss-pm">–</dd></div>
+      <div><dt>Look-ahead rule gives up</dt><dd id="loss-wb">–</dd></div>
+      <div><dt>Recovered</dt><dd id="loss-rec">–</dd></div>
+    </dl>
+  </div>
+  <figcaption id="lab-cap" class="print-cap"><span>Time in units of σ²/μ², and cost per unit of that time; bounds as the confidence they ask for. Losses in points per 100 decisions against the best bounds. Your browser uses a coarser grid than the paper, so its losses match the paper’s to within a few hundredths of a point, and it shows the share recovered only when my 2025 rule’s loss is large enough to measure that well. <span id="lab-ms"></span></span></figcaption>
+</figure>
+
+<section class="col" id="weights" aria-labelledby="h-weights">
+  <h2 id="h-weights">How far ahead to look</h2>
+  <div data-block="weights-1">
+    <p>The weight <i>w</i>(<i>s</i>) says how much the cost <i>s</i> time units ahead should count. It comes from asking what a small rise in the cost at time <i>t</i> + <i>s</i> does to a decision sitting at a bound. It hurts only if the decision is still going then, so each future moment counts in proportion to how fast the chance of still deciding then changes as you start further from the bounds.</p>
+    <p>That has a closed form, a sum of decaying exponentials. It’s heaviest right away, with a long tail, so on average the rule looks ahead less far than a decision lasts.</p>
+  </div>
+  <figure class="print kernel" id="kernel" aria-labelledby="kernel-cap">
+    <label class="dial dial-wide"><span class="dial-key">Cost per unit time</span><output id="k-cost-out" for="k-cost"></output><input type="range" id="k-cost" min="0" max="100" value="50"></label>
+    <svg class="lanes" id="kernel-svg" role="img" aria-label="The look-ahead weight w(s) over the next few time units, with the point by which half the weight has passed and its mean"></svg>
+    <dl class="losses">
+      <div><dt>Half the weight within</dt><dd id="k-median">–</dd></div>
+      <div><dt>Mean look-ahead</dt><dd id="k-mean">–</dd></div>
+      <div><dt>Mean decision time</dt><dd id="k-rt">–</dd></div>
+    </dl>
+    <figcaption id="kernel-cap" class="print-cap"><span>Time in units of σ²/μ², the time it takes the evidence to reach a signal-to-noise ratio of 1 (<span data-n="PalmerT">554</span> ms for the observer above at 6.4% motion strength).</span></figcaption>
+  </figure>
+  <div data-block="weights-2">
+    <p>Two details make it work. It averages bounds, not costs, which handles a deadline with no special case: past the deadline my 2025 rule’s bounds are at 0, and the average brings the bounds down before the deadline arrives. And the weight depends on the bounds, so the rule computes it at the bounds it produces: thirty damped passes, each just a weighted average, and no dynamic programming.</p>
+  </div>
+</section>
+
+<section class="col" id="evidence" aria-labelledby="h-evidence">
+  <h2 id="h-evidence">How well it holds up</h2>
+  <div data-block="evidence-1">
+    <p>I settled the rule on 90 development schedules, then fixed a test set before running anything on it: <span data-n="HeldCount">210</span> new schedules from seven families (smooth changes, steps, deadlines, pulses, ramps, several steps, and piecewise levels), drawn from a seed chosen in advance.</p>
+    <p>My 2025 rule loses little. Its median loss is <span data-n="HeldPerMomentMedian">0.13</span> points per 100 decisions, and it lost under a tenth of a point on <span data-n="HeldPerMomentUnderTenth">87</span> of the <span data-n="HeldCount">210</span>. The look-ahead rule loses less: a median of <span data-n="HeldWeightedMedian">0.0022</span> points, at most <span data-n="HeldWeightedMax">0.235</span>. On each of the <span data-n="HeldRecoveredCount">180</span> schedules where my 2025 rule lost at least 0.01 points, it recovered a median of <span data-n="HeldRecoveredMedian">98.3</span>% of that loss (10th percentile <span data-n="HeldRecoveredPTen">90.4</span>%, worst <span data-n="HeldRecoveredMin">55.8</span>%).</p>
+  </div>
+</section>
+
+<figure class="print held" id="held" aria-labelledby="held-cap">
+  <div class="held-grid">
+    <div class="held-plot">
+      <svg class="lanes" id="held-svg" role="img" aria-label="Each held-out schedule: my 2025 rule’s loss against the look-ahead rule’s loss, both on log scales"></svg>
+      <ul class="legend" id="held-legend"></ul>
+    </div>
+    <div class="held-detail" id="held-detail">
+      <p class="held-name" id="held-name">Tap a mark to rerun its schedule here.</p>
+      <svg class="lanes" id="held-lanes" role="img" aria-label="The chosen schedule’s cost and the three rules’ bounds"></svg>
+      <table class="mini" id="held-table">
+        <thead><tr><th scope="col"></th><th scope="col">Your browser</th><th scope="col">The paper</th></tr></thead>
+        <tbody>
+          <tr class="k-pm"><th scope="row">My 2025 rule gives up</th><td id="hd-pm-here">–</td><td id="hd-pm-paper">–</td></tr>
+          <tr class="k-wb"><th scope="row">Look-ahead rule gives up</th><td id="hd-wb-here">–</td><td id="hd-wb-paper">–</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <figcaption id="held-cap" class="print-cap"><span>Points per 100 decisions; losses under 10<sup>−5</sup> sit on the axes. Time in units of σ²/μ², cost per unit of that time. Your browser reruns a schedule on a coarser grid than the paper, so its losses can differ by a few hundredths of a point.</span></figcaption>
+</figure>
+
+<section class="col" aria-labelledby="h-evidence">
+  <div data-block="evidence-2">
+    <p>Shifting the bounds instead doesn’t do this. Moving my 2025 rule’s bounds forward by the mean look-ahead lost more than not shifting at all on <span data-n="HeldShiftMeanWorse">83</span> of the <span data-n="HeldNoDeadlineCount">180</span> schedules without deadlines.</p>
+  </div>
+</section>
+
+<section class="col" id="first-order" aria-labelledby="h-first-order">
+  <h2 id="h-first-order">Exact to first order</h2>
+  <div data-block="first-order-1">
+    <p>For small changes in cost, the rule is more than a good guess. The paper proves that, to first order, the best bounds move by the weighted average of my 2025 rule’s moves, with exactly these weights; when the cost changes smoothly, the error shrinks at least as fast as the square of the change. On a 10% wiggle in the cost, <i>c</i>(<i>t</i>) = <i>c</i><sub>0</sub>(1 + 0.1 sin <i>ωt</i>), the predicted swing is within <span data-n="SweepSwingTenth">0.2</span>% of the exact one and its timing within <span data-n="ClosedFormWorstLead">0.24</span>° across the paper’s test cases.</p>
+    <p>The best bounds move ahead of the cost, by close to an eighth of a cycle when the cost changes fast. My 2025 rule moves with the cost, never ahead of it. Change how fast the cost wiggles and read the gap at the line.</p>
+  </div>
+</section>
+
+<figure class="print wave" id="wave" aria-labelledby="wave-cap">
+  <label class="dial dial-wide"><span class="dial-key">How fast the cost wiggles, <i>ω</i>, radians per unit time</span><output id="w-out" for="w-omega"></output><input type="range" id="w-omega" min="0" max="1000" value="500"></label>
+  <svg class="lanes" id="wave-svg" role="img" aria-label="Two cycles of a wiggling cost and how the bounds move: my 2025 rule’s move with the cost, the look-ahead rule’s and the best bounds move ahead of it"></svg>
+  <div class="wave-foot">
+    <dl class="losses">
+      <div><dt>Bounds lead the cost by</dt><dd id="w-lead">–</dd></div>
+      <div><dt>Swing, against my 2025 rule</dt><dd id="w-gain">–</dd></div>
+    </dl>
+    <svg class="lanes lead-chart" id="lead-svg" role="img" aria-label="How far ahead of the cost the bounds move, in degrees, against how fast the cost wiggles, approaching 45 degrees"></svg>
+  </div>
+  <figcaption id="wave-cap" class="print-cap"><span>Cost 0.1 with a 10% wiggle; time in units of σ²/μ²; the bounds’ swing drawn as a share of my 2025 rule’s swing. The line is the look-ahead rule, computed here to first order; the dots are fits to the best bounds from dynamic programming at five speeds.</span></figcaption>
+</figure>
+
+<section class="col" id="unknown" aria-labelledby="h-unknown">
+  <h2 id="h-unknown">When the evidence’s strength is unknown</h2>
+  <div data-block="unknown">
+    <p>In real tasks, easy and hard trials come mixed together, so you don’t know how strong the evidence is. Then the best bounds fall over time even when the cost doesn’t: a decision that’s taking a long time is probably a hard one, and more waiting won’t help it much.</p>
+    <p>Measure the evidence in units of its own uncertainty, <i>u</i> = <i>X</i>/√(<i>t</i> + <i>a</i>), and run the clock on a log scale, <i>τ</i> = log((<i>t</i> + <i>a</i>)/<i>a</i>). Then the belief moves the same way at every moment, and a cost of <i>c</i> per second becomes <i>c</i>·(<i>t</i> + <i>a</i>) per tick: information arrives more and more slowly, so even a constant cost rises on that clock. My 2025 rule, which treats each moment as if time stood still, is the same rule on that clock. The same look-ahead rule, built with that process’s own weights, does about as well here as with known strength; the paper shows this numerically, without a proof.</p>
+  </div>
+  <div class="table-scroll">
+    <table class="data" id="unknown-table">
+      <caption>Points per 100 decisions given up against the best bounds, with <i>a</i> = 1</caption>
+      <thead><tr><th scope="col">Cost schedule</th><th scope="col">My 2025 rule</th><th scope="col">Look-ahead rule</th><th scope="col">Plug-in</th><th scope="col">Tuned constant</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="note" data-block="unknown-note">Plug-in treats the current estimate of the strength as exact. Tuned constant is the best single pair of bounds for each schedule, found by search: about as good as the look-ahead rule when the cost is constant, not when it changes.</p>
+</section>
+
+<section class="col" id="changed" aria-labelledby="h-changed">
+  <h2 id="h-changed">What changed since 2025</h2>
+  <div data-block="changed">
+    <p>In April of 2025, I presented this work as my undergraduate research capstone at the University of Cincinnati: an implementation of <a href="https://www.drugowitschlab.org/assets/pdf/fens2015_notes.pdf">Jan Drugowitsch’s notes on normative solutions to the speed-accuracy trade-off</a>. The model, its main results, and every cost sweep in the talk at σ² = 1 hold up, though a few slides misstate steps of the derivations. The code had serious errors, which I found when I re-checked it this fall. They’re fixed in the new code, with tests. The original code and talk stay online as they were.</p>
+  </div>
+  <details class="fixes">
+    <summary>The twelve corrections<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></summary>
+    <ol>
+      <li><h3>The dynamic program stopped after three iterations</h3><p>Its stopping tolerance wasn’t scaled by the time step, so it quit long before the values settled. Confidence at the bound for a cost of 0.1:</p><p class="was"><s>0.516</s><span>0.936</span></p></li>
+      <li><h3>Its belief grid was too coarse for its time step</h3><p>With 100 belief levels and a step of 0.0001, most of the probability never left its cell. Even fully converged, at a cost of 0.2:</p><p class="was"><s>0.742</s><span>0.865</span></p></li>
+      <li><h3>The belief used the hidden answer</h3><p>The belief formula included the true direction, so when the answer was left it reported the belief in the true answer rather than in “right.” Every example in the talk used right, so no number shown there changed. A case with the answer left and the evidence favoring right, belief in “right”:</p><p class="was"><s>0.203</s><span>0.797</span></p></li>
+      <li><h3>Its transition matrix was applied transposed</h3><p>So the belief stopped being a fair forecast of itself. Expected next belief from 0.7506:</p><p class="was"><s>0.7499</s><span>0.7506</span></p></li>
+      <li><h3>The mean decision time dropped a factor of σ²</h3><p>Exact at σ² = 1, which every example in the talk used, and wrong elsewhere. Confidence at the best bound for σ² = 5 and a cost of 0.2:</p><p class="was"><s>0.526</s><span>0.620</span></p></li>
+      <li><h3>Changing costs used my 2025 rule as the answer</h3><p>It’s an approximation, the one this page measures. Two schedules both start at a cost of 0.2, and one jumps to 0.9 at <i>t</i> = 0.1. Their exact starting bounds differ, a confidence of 0.859 and 0.748; my 2025 rule gives 0.865 for both:</p><p class="was"><s>0.865</s><span>0.748</span><small>for the jumping schedule</small></p></li>
+      <li><h3>Unknown strength: the drift was redrawn at every step</h3><p>In the model it’s drawn once per trial, so trials differ in difficulty. Variance of the evidence at <i>t</i> = 1:</p><p class="was"><s>1.004</s><span>1.363</span></p></li>
+      <li><h3>Unknown strength: with a biased prior, the belief didn’t match the simulation</h3><p>The starting evidence was shifted as if the prior on the drift had a nonzero mean, while the simulation still drew a zero-centered strength with the given sign. Belief in “right” at a prior of 0.8, <i>t</i> = 1, and <i>X</i> = 0:</p><p class="was"><s>0.724</s><span>0.8</span></p></li>
+      <li><h3>Unknown strength: a frozen-time bound at each moment</h3><p>The exact policy needs backward induction over time. Done right, the frozen-time bound starts too high. Confidence at the bound at <i>t</i> = 0, cost 0.2:</p><p class="was"><s>0.796</s><span>0.753</span></p></li>
+      <li><h3>In the talk: the bound paired with the wrong confidence</h3><p>Slide 28 pairs the bound 0.9307 with the confidence at a different point, <i>X</i> = 0.729, and slide 32 reuses it.</p><p class="was"><s>0.81135</s><span>0.8655</span></p></li>
+      <li><h3>In the talk: the mean time marked as one trial’s stop</h3><p>Slides 23 and 28 treat the mean decision time as the time a single path stops. That path first crosses the bound earlier:</p><p class="was"><s>0.680</s><span>0.563</span></p></li>
+      <li><h3>In the talk: the σ² sweeps</h3><p>Slides 29 to 31 inherit the missing σ². Mean decision time at σ² = 10:</p><p class="was"><s>0.0159</s><span>0.154</span></p></li>
+    </ol>
+    <p class="note">Smaller fixes: slide 10 calls Bayes’ rule an approximation that improves with smaller steps, when under this model it’s exact, and slides 12 and 15 put the prior inside the product over observations; the simulated beliefs on slides 16 and 32 used 1/(1 + e<sup>−<i>X</i></sup>) where the slides print 1/(1 + e<sup>−2<i>X</i></sup>), so one “continue” row should have stopped; <code>np.float128</code>, which doesn’t exist on Apple silicon or Windows; a path that never reached a bound reported as stopping at <i>t</i> = 0; root finders that couldn’t run; and a helper that saved a video at every time step.</p>
+  </details>
+</section>
+
+<section class="col" id="links" aria-labelledby="h-links">
+  <h2 id="h-links">Paper, code, and checks</h2>
+  <ul class="links">
+    <li><span class="pending">The paper (PDF)</span><span><i>Waiting, weighted: optimal decision bounds when the cost of time changes.</i> Not yet released. The theorem, its proof, and every measurement on this page.</span></li>
+    <li><span class="pending">The code</span><span>Not yet public. The solvers, the experiments, this page, and their tests.</span></li>
+    <li><a href="https://github.com/ryanjosephkamp/perceptual-decision-making-capstone">My 2025 capstone code</a><span>As presented, unchanged.</span></li>
+    <li><a href="https://youtu.be/LRAP1YHy3g0">My 2025 capstone talk</a><span>April 11, 2025, on YouTube.</span></li>
+    <li><a href="https://www.drugowitschlab.org/assets/pdf/fens2015_notes.pdf">Jan Drugowitsch’s notes</a><span>Notes on normative solutions to the speed-accuracy trade-off in perceptual decision-making, the FENS-Hertie Winter School, 2015.</span></li>
+  </ul>
+  <details class="fixes checks-fold" id="checks">
+    <summary><h3 id="h-checks">How this page is checked</h3><span class="fold-end"><span id="checks-count"></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span></summary>
+    <div data-block="checks">
+      <p>Every number in the text comes from the paper’s generated results, except the 2025 corrections, which come from my audit of the 2025 code and talk, and the working examples’ own numbers, which come from the same methods run on their schedules. Everything the page computes runs the same algorithms as the paper’s Python code, on coarser grids, and a script compares the two before the page is published. These are its results.</p>
+    </div>
+    <div class="table-scroll">
+      <table class="data checks" id="checks-table">
+        <caption id="checks-cap">Browser against the Python reference</caption>
+        <thead><tr><th scope="col">What is compared</th><th scope="col">Largest difference</th><th scope="col">Allowed</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </details>
+  <p class="note" data-block="fine-print">None of this is peer-reviewed.</p>
+</section>
+
+</article>
+</main>
+
+<footer class="foot">
+  <div class="site-credit">
+    <p class="site-credit-made">Made by <a href="https://ryanjosephkamp.github.io/">Ryan Kamp</a></p>
+    <ul class="site-credit-social" aria-label="Ryan Kamp online">
+      <li><a href="https://ryanjosephkamp.github.io/" aria-label="Ryan Kamp’s website" title="Website"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.2"/><path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.9 5.7 3.9 9.2s-1.3 6.6-3.9 9.2c-2.6-2.6-3.9-5.7-3.9-9.2S9.4 5.4 12 2.8Z"/></g></svg></a></li>
+      <li><a href="https://github.com/ryanjosephkamp/" aria-label="Ryan Kamp on GitHub" title="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a></li>
+      <li><a href="https://www.linkedin.com/in/ryanjosephkamp/" aria-label="Ryan Kamp on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a></li>
+      <li><a href="https://x.com/ryanjosephkamp" aria-label="Ryan Kamp on X" title="X"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg></a></li>
+      <li><a href="https://m.youtube.com/@RyanJosephKamp" aria-label="Ryan Kamp on YouTube" title="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a></li>
+    </ul>
+    <a class="site-credit-sponsor" href="https://github.com/sponsors/ryanjosephkamp"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M10 16.8S3 12.6 3 7.6A3.6 3.6 0 0 1 10 6a3.6 3.6 0 0 1 7 1.6c0 5-7 9.2-7 9.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Sponsor on GitHub</a>
+  </div>
+</footer>
+<script type="module" src="js/site.js"></script>
+</body>
+</html>

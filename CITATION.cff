@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this code or the paper's results, please cite the paper."
+title: "speed-accuracy-tradeoff"
+authors:
+  - family-names: Kamp
+    given-names: Ryan
+license: MIT
+repository-code: "https://github.com/ryanjosephkamp/speed-accuracy-tradeoff"
+preferred-citation:
+  type: article
+  title: "Waiting, weighted: optimal decision bounds when the cost of time changes"
+  authors:
+    - family-names: Kamp
+      given-names: Ryan
+  year: 2026
+  notes: "Preprint"

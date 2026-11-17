@@ -1,0 +1,1174 @@
+{
+ "date": "2026-11-17",
+ "rows": [
+  {
+   "name": "text numbers equal the page's data file (26)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "data file numbers equal the paper's generated macros (53)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "data file tables equal the stored results (held-out, unknown strength, first order)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "bound table vs Python table (paper units)",
+   "worst": "1.43e-12",
+   "tol": "1.00e-6",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "bound table vs exact root (paper units)",
+   "worst": "2.15e-6",
+   "tol": "2.00e-4",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "best bound in seconds units vs Python, rescaled",
+   "worst": "1.67e-14",
+   "tol": "1.00e-9",
+   "unit": " (relative)",
+   "pass": true
+  },
+  {
+   "name": "accuracy at the bound vs Python",
+   "worst": "0",
+   "tol": "1.00e-12",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "mean decision time vs Python",
+   "worst": "1.79e-16",
+   "tol": "1.00e-9",
+   "unit": " (relative)",
+   "pass": true
+  },
+  {
+   "name": "kernel mean vs Python",
+   "worst": "3.33e-16",
+   "tol": "1.00e-6",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "kernel median bin vs Python",
+   "worst": "1.11e-16",
+   "tol": "1.00e-6",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "kernel median, interpolated in its bin, vs Python",
+   "worst": "2.50e-16",
+   "tol": "1.00e-6",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "mean look-ahead (page's cached kernel) vs closed form",
+   "worst": "6.46e-4",
+   "tol": "0.00200",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "transfer gain vs closed form",
+   "worst": "0.00148",
+   "tol": "0.00200",
+   "unit": " (relative)",
+   "pass": true
+  },
+  {
+   "name": "transfer lead vs closed form",
+   "worst": "0.108",
+   "tol": "0.200",
+   "unit": "°",
+   "pass": true
+  },
+  {
+   "name": "transfer gain vs dynamic program fits",
+   "worst": "8.99e-4",
+   "tol": "0.00200",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "transfer lead vs dynamic program fits",
+   "worst": "0.271",
+   "tol": "0.300",
+   "unit": "°",
+   "pass": true
+  },
+  {
+   "name": "showcase: per-moment bound vs Python",
+   "worst": "5.00e-5",
+   "tol": "1.00e-4",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "showcase: weighted bound vs Python",
+   "worst": "5.00e-5",
+   "tol": "1.00e-4",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "showcase: exact bound vs Python (coarser grid)",
+   "worst": "0.00518",
+   "tol": "0.00600",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "showcase: losses vs Python",
+   "worst": "0.0348",
+   "tol": "0.0400",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "keeper's schedule: 2025 and look-ahead bounds vs Python",
+   "worst": "4.94e-5",
+   "tol": "1.00e-4",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper's schedule: exact bound vs Python (coarser grid)",
+   "worst": "0.00334",
+   "tol": "0.00600",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper's schedule: losses vs Python, beyond 0.04 points or 1% of the loss",
+   "worst": "0",
+   "tol": "0",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "robot's schedule: 2025 and look-ahead bounds vs Python",
+   "worst": "4.95e-5",
+   "tol": "1.00e-4",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot's schedule: exact bound vs Python (coarser grid)",
+   "worst": "0.00580",
+   "tol": "0.00600",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot's schedule: losses vs Python, beyond 0.04 points or 1% of the loss",
+   "worst": "0",
+   "tol": "0",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "recorder's schedule: 2025 and look-ahead bounds vs Python",
+   "worst": "4.88e-5",
+   "tol": "1.00e-4",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder's schedule: exact bound vs Python (coarser grid)",
+   "worst": "0.00437",
+   "tol": "0.00600",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder's schedule: losses vs Python, beyond 0.04 points or 1% of the loss",
+   "worst": "0",
+   "tol": "0",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "cost lab: presets equal the showcase schedules",
+   "worst": "1.11e-15",
+   "tol": "1.00e-12",
+   "unit": " (relative)",
+   "pass": true
+  },
+  {
+   "name": "cost lab: preset losses vs Python",
+   "worst": "0.0348",
+   "tol": "0.0400",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "cost lab: a drawn cost is linear in log cost between its points",
+   "worst": "0",
+   "tol": "1.00e-12",
+   "unit": " (relative)",
+   "pass": true
+  },
+  {
+   "name": "machine: exact scoring vs gambler's-ruin formulas, bounds 1 to 40",
+   "worst": "1.20e-14",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "machine: optimal bounds for a constant cost = best constant bounds (5 costs, 300 rows)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "machine: the dynamic program's value = the forward-scored reward of its bounds (4 schedules)",
+   "worst": "3.44e-15",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "machine at other strengths (0.4 to 2.5): scoring vs gambler's ruin, and DP value vs forward score",
+   "worst": "9.70e-15",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "machine at other strengths: optimal bounds for a steady cost = best constant bounds",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "machine: per-moment loss on the board vs the paper's (4 showcase schedules)",
+   "worst": "0.106",
+   "tol": "0.120",
+   "unit": " (relative)",
+   "pass": true
+  },
+  {
+   "name": "machine: dropped balls' accuracy vs exact",
+   "worst": "0.312",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "machine: dropped balls' mean time vs exact",
+   "worst": "0.0336",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "machine: look-ahead's mean reach vs the paper's formula (bounds 0.6 to 4.0)",
+   "worst": "0.0118",
+   "tol": "0.0150",
+   "unit": " (relative)",
+   "pass": true
+  },
+  {
+   "name": "machine: look-ahead's shape vs the paper's series, largest gap in cumulative weight (bounds 0.6 to 4.0)",
+   "worst": "0.0231",
+   "tol": "0.0250",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "machine: the same for the narrowest bounds, 0.3 (mean, relative; shape)",
+   "worst": "0.884",
+   "tol": "1.00",
+   "unit": " of the limits 4% and 0.05",
+   "pass": true
+  },
+  {
+   "name": "machine: look-ahead at cost 0.1 on the board vs the paper's 0.546",
+   "worst": "0.0259",
+   "tol": "0.0400",
+   "unit": " (relative)",
+   "pass": true
+  },
+  {
+   "name": "machine: look-ahead rule vs the best bounds, mean gap per schedule (the 2025 rule's: up to 3.3)",
+   "worst": "0.856",
+   "tol": "1.00",
+   "unit": " pegs",
+   "pass": true
+  },
+  {
+   "name": "machine: look-ahead rule vs the best bounds, largest gap (away from the last 0.05 before a deadline)",
+   "worst": "1.44",
+   "tol": "1.50",
+   "unit": " pegs",
+   "pass": true
+  },
+  {
+   "name": "scenarios: losses in the text equal the stored results (22)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "scenarios: the prints' curves equal the stored results",
+   "worst": "0",
+   "tol": "5.00e-5",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "scenarios: decisions per correct answer's worth, from the unrounded median loss",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "walkthrough: readings, confidence, bounds, times, and outcomes in 213704 sentences on 5 boards match the balls' paths",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "walkthrough: cars forced by the deadline occur, and are said so",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "walkthrough: the best bounds run inside the 2025 rule's while the cost is within 1% of its start, a tenth of a unit or more before the change (3 schedules)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "theme dial: every turned color reads at 4.5:1 or more on its theme's surfaces (360 positions, 2 themes)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "theme dial: colors that appear together stay at least 0.08 apart in OKLab at every position",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "theme dial: at rest, the colors are the ones site.css prints",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "held-out: cost formulas vs Python at probe times",
+   "worst": "9.45e-16",
+   "tol": "1.00e-9",
+   "unit": " (relative)",
+   "pass": true
+  },
+  {
+   "name": "held-out (210): per-moment loss vs Python, absolute",
+   "worst": "0.0614",
+   "tol": "0.120",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "held-out (210): weighted loss vs Python, absolute",
+   "worst": "0.0102",
+   "tol": "0.0300",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "held-out (210): per-moment loss, beyond 0.02 points, relative",
+   "worst": "0.0187",
+   "tol": "0.0500",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "held-out (210): weighted loss, beyond 0.002 points, relative",
+   "worst": "0.0774",
+   "tol": "0.500",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "dots: running net steps = rounded evidence, every frame (36726 frames)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "dots: never more steppers than dots",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "trials: played frame by frame with dots = run straight (8,000 trials)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "trials: accuracy vs closed form, beyond 0.002",
+   "worst": "0",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "trials: mean time vs closed form, beyond 1%",
+   "worst": "0",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "car: best and 2025 bounds equal the lattice's, look-ahead bounds equal the rule rounded up (100 rows)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "car: the look-ahead rule's level is the same from either start",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "car: the best bounds' exact score equals the dynamic program's value, no rule beats it, and each run pays its rows' costs",
+   "worst": "2.22e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "car: the board's losses vs the paper's model for the same schedule (2025 rule, relative)",
+   "worst": "0.0739",
+   "tol": "0.120",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "car: the board's losses vs the paper's model for the same schedule (look-ahead, absolute)",
+   "worst": "0.0102",
+   "tol": "0.0200",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "car: the 2025 rule's share forced at the line, as the text says",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "car: the three cars see the same readings (3,000 cars, each rule run alone)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "car: running scores after 20,000 cars vs exact",
+   "worst": "1.67",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "car: each rule's exact commit times sum to one and give its mean time, forced share, doubt paid, and score",
+   "worst": "2.22e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "car: the strip's bars and forced share after 30,000 cars vs exact (68 bars, the rarest pooled)",
+   "worst": "2.16",
+   "tol": "4.50",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "car: the table's successes, doubt, and mean wait after 30,000 cars vs exact",
+   "worst": "1.17",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "car: the table's points are successes less doubt, and the 2025 rule's gap is within its sampling error of exact",
+   "worst": "1.42e-14",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: best and 2025 bounds equal the lattice's, look-ahead bounds equal the rule rounded up (100 rows)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: the look-ahead rule's level is the same from either start",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: the best bounds' exact score equals the dynamic program's value, no rule beats it, and each run pays its rows' costs",
+   "worst": "1.11e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: the board's losses vs the paper's model for the same schedule (2025 rule, relative)",
+   "worst": "0.00403",
+   "tol": "0.120",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: the board's losses vs the paper's model for the same schedule (look-ahead, absolute)",
+   "worst": "0.0417",
+   "tol": "0.0500",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "keeper: the 2025 rule's share forced at the kick, as the text says",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: the three keepers see the same readings (3,000 kicks, each rule run alone)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: running scores after 20,000 kicks vs exact",
+   "worst": "1.77",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "keeper: each rule's exact commit times sum to one and give its mean time, forced share, doubt paid, and score",
+   "worst": "3.33e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: the strip's bars and forced share after 30,000 kicks vs exact (65 bars, the rarest pooled)",
+   "worst": "2.31",
+   "tol": "4.50",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "keeper: the table's successes, doubt, and mean wait after 30,000 kicks vs exact",
+   "worst": "1.70",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "keeper: the table's points are successes less doubt, and the 2025 rule's gap is within its sampling error of exact",
+   "worst": "1.42e-14",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: rounding helps the look-ahead rule here, as the text says (board loss below the smooth model's)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: numbers in its text equal the model's (5 computed, 3 typed)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "keeper: the 2025 rule's bound stays above the best bound until the kick and is still open there",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: best and 2025 bounds equal the lattice's, look-ahead bounds equal the rule rounded up (300 rows)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: the look-ahead rule's level is the same from either start",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: the best bounds' exact score equals the dynamic program's value, no rule beats it, and each run pays its rows' costs",
+   "worst": "4.44e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: the board's losses vs the paper's model for the same schedule (2025 rule, relative)",
+   "worst": "0.0620",
+   "tol": "0.120",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: the board's losses vs the paper's model for the same schedule (look-ahead, absolute)",
+   "worst": "0.0356",
+   "tol": "0.0500",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "robot: the three robots see the same readings (3,000 rocks, each rule run alone)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: running scores after 20,000 rocks vs exact",
+   "worst": "0.933",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "robot: each rule's exact commit times sum to one and give its mean time, forced share, doubt paid, and score",
+   "worst": "8.88e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: the strip's bars and forced share after 30,000 rocks vs exact (195 bars, the rarest pooled)",
+   "worst": "3.37",
+   "tol": "4.50",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "robot: the table's successes, doubt, and mean wait after 30,000 rocks vs exact",
+   "worst": "1.95",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "robot: the table's points are successes less doubt, and the 2025 rule's gap is within its sampling error of exact",
+   "worst": "1.42e-14",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot, steady cost: best and 2025 bounds equal the lattice's, look-ahead bounds equal the rule rounded up (300 rows)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot, steady cost: the look-ahead rule's level is the same from either start",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot, steady cost: the best bounds' exact score equals the dynamic program's value, no rule beats it, and each run pays its rows' costs",
+   "worst": "2.22e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot, steady cost: the three robots see the same readings (3,000 rocks, each rule run alone)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot, steady cost: running scores after 20,000 rocks vs exact",
+   "worst": "0.707",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "robot, steady cost: each rule's exact commit times sum to one and give its mean time, forced share, doubt paid, and score",
+   "worst": "7.77e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot, steady cost: the strip's bars and forced share after 30,000 rocks vs exact (220 bars, the rarest pooled)",
+   "worst": "3.22",
+   "tol": "4.50",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "robot, steady cost: the table's successes, doubt, and mean wait after 30,000 rocks vs exact",
+   "worst": "1.73",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "robot, steady cost: the table's points are successes less doubt, and the 2025 rule's gap is within its sampling error of exact",
+   "worst": "0",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: numbers in its text equal the model's (10)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: the best bound's lead over a step, as the print says (\"about\", within a degree; and a tenth of a step)",
+   "worst": "0",
+   "tol": "0",
+   "unit": " degrees",
+   "pass": true
+  },
+  {
+   "name": "robot: the 2025 rule's bounds swing more than three times as far as the best bounds (board and paper's model)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: the 2025 rule's choices just before a footfall (a half) and the best bounds' (a third)",
+   "worst": "0.0176",
+   "tol": "0.0500",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot, steady cost: bounds agree until 2.21 s, and 20,000 rocks chose alike at least as often as the text's bound",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "robot: the numbers typed in its text and print follow from the model (6 claims)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: best and 2025 bounds equal the lattice's, look-ahead bounds equal the rule rounded up (300 rows)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: the look-ahead rule's level is the same from either start",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: the best bounds' exact score equals the dynamic program's value, no rule beats it, and each run pays its rows' costs",
+   "worst": "4.77e-15",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: the board's losses vs the paper's model for the same schedule (2025 rule, relative)",
+   "worst": "0.0824",
+   "tol": "0.120",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: the board's losses vs the paper's model for the same schedule (look-ahead, absolute)",
+   "worst": "0.0189",
+   "tol": "0.0500",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "recorder: the 2025 rule's share forced at the bird's last song, as the text says",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: the three recorders see the same readings (3,000 birds, each rule run alone)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: running scores after 20,000 birds vs exact",
+   "worst": "0.740",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "recorder: each rule's exact commit times sum to one and give its mean time, forced share, doubt paid, and score",
+   "worst": "6.66e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: the strip's bars and forced share after 30,000 birds vs exact (221 bars, the rarest pooled)",
+   "worst": "3.10",
+   "tol": "4.50",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "recorder: the table's successes, doubt, and mean wait after 30,000 birds vs exact",
+   "worst": "3.05",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "recorder: the table's points are successes less doubt, and the 2025 rule's gap is within its sampling error of exact",
+   "worst": "0",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: numbers in its text equal the model's (14)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: the print's claims hold on the stored curves (what each asks for in the dark, rising early, falling before the end)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "recorder: the numbers typed in its text and print follow from the model (6 claims)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lander: best and 2025 bounds equal the lattice's, look-ahead bounds equal the rule rounded up (250 rows)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lander: the look-ahead rule's level is the same from either start",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lander: the best bounds' exact score equals the dynamic program's value, no rule beats it, and each run pays its rows' costs",
+   "worst": "5.55e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lander: the board's losses vs the paper's model for the same schedule (2025 rule, relative)",
+   "worst": "0.106",
+   "tol": "0.120",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lander: the board's losses vs the paper's model for the same schedule (look-ahead, absolute)",
+   "worst": "0.00257",
+   "tol": "0.0200",
+   "unit": " points per 100",
+   "pass": true
+  },
+  {
+   "name": "lander: the three landers see the same readings (3,000 landings, each rule run alone)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lander: running scores after 20,000 landings vs exact",
+   "worst": "1.10",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "lander: each rule's exact commit times sum to one and give its mean time, forced share, doubt paid, and score",
+   "worst": "9.99e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lander: the strip's bars and forced share after 30,000 landings vs exact (101 bars, the rarest pooled)",
+   "worst": "2.10",
+   "tol": "4.50",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "lander: the table's successes, doubt, and mean wait after 30,000 landings vs exact",
+   "worst": "1.56",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "lander: the table's points are successes less doubt, and the 2025 rule's gap is within its sampling error of exact",
+   "worst": "1.42e-14",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lander: numbers in its text equal the model's (11)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lander: its cost is the print's schedule (largest gap 4.4e-16), and the claims in its text hold (3)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lander: the numbers typed in its text and print follow from the model (4 claims)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "sorter: at each of the 4 speeds the bounds are the lattice's, the best score is the dynamic program's, and no rule beats it",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "sorter: the mixed speeds' commit times sum to one, their last bar is the forced share, and their scores are the four speeds' averages",
+   "worst": "4.44e-16",
+   "tol": "1.00e-9",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "sorter: the strip's bars and forced share after 30,000 mixed flakes vs the mix (102 bars, the rarest pooled)",
+   "worst": "2.72",
+   "tol": "4.50",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "sorter: the table's right share and doubt after 30,000 mixed flakes vs the mix",
+   "worst": "0.414",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "sorter: numbers in its text equal the models' (13)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "sorter: the numbers typed in its text follow from the model, and its bounds do what the text says (7 claims)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "game: on each of its 3 roads the bounds are the lattice's, the best score is the dynamic program's, and no rule beats it",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "game: 20,000 rounds on each road average to each rule's exact score, in points and in fair points",
+   "worst": "1.89",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "game: stopping where a rule stops gives that rule's result, and running out of time goes with the readings (3,600 rounds)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "game: glints show opposite the side their reading points to (1,500,000), on the truck's side 55.0% of the time against 55%",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "game: numbers in its text equal the models' (6)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "game: the numbers typed in its text follow from the model, and the bounds do what its text says (7 claims)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lab test: one model time unit, rounded, equals the paper's PalmerT",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lab test: numbers in the text equal those computed from the stored curves (7)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lab test, lifting: numbers in its text equal those computed from the stored curves (9), and its claims hold (4)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "lab test: trials at a steady bound vs closed-form accuracy, beyond 0.002",
+   "worst": "0",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "lab test: the same, mean decision time, beyond 1% (and none cut off)",
+   "worst": "0",
+   "tol": "4.00",
+   "unit": " standard errors",
+   "pass": true
+  },
+  {
+   "name": "lab test: the dots' running net steps = rounded evidence (11287 frames)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "scenarios: print readouts at every stored sample say the stored confidence (782)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  },
+  {
+   "name": "scenarios: readouts in milliseconds (lab, 1/mu^2 s per unit), seconds (car, keeper, and robot, 1 s per unit; lander, 10 s), and minutes (recorder, 10 min per unit)",
+   "worst": "0",
+   "tol": "0",
+   "unit": "",
+   "pass": true
+  }
+ ]
+}
