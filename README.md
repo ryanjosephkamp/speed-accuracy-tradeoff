@@ -13,7 +13,7 @@ whatever the cost. A rule built on the result, the weighted look-ahead, is teste
 policy on 210 held-out cost schedules.
 
 - **Paper:** [`paper/Kamp-2026-Waiting-weighted.pdf`](paper/Kamp-2026-Waiting-weighted.pdf), with
-  its LaTeX source in `paper/`. Preprint: [PsyArXiv link to come].
+  its LaTeX source in `paper/`.
 - **Site:** the decision machine, an interactive explainer with live versions of the paper's
   results, at https://speed-accuracy.rk-folio-5f2dc2.pages.dev. Its source is in `site/`.
 
