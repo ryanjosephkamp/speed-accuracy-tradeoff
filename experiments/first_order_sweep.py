@@ -1,6 +1,6 @@
-"""Theorem 7 against the exact policy at three costs, two frequencies, and four perturbation sizes.
+"""The first-order prediction against the exact policy at three costs, two frequencies, and four perturbation sizes.
 
-For c(t) = c0 + eps sin(omega t), the theorem predicts the bound's response to first order:
+For c(t) = c0 + eps sin(omega t), the first-order analysis predicts the bound's response:
 delta b(t) = eps B'(c0) Im(w~(-i omega) e^{i omega t}), with w~ the kernel's Laplace transform.
 This fits a sinusoid (plus a constant) to the difference between the exact evidence bounds with
 and without the perturbation, over whole periods well away from t = 0 and the horizon, and

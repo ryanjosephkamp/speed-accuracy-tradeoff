@@ -176,6 +176,12 @@ a:hover { text-decoration-color: currentColor; }
 }
 .toc a::before { content: counter(toc); color: var(--print-dim); font-variant-numeric: tabular-nums; font-size: 0.8rem; }
 .toc a:hover, .toc a[aria-current="true"] { background: var(--print-2); }
+/* on phones the menu sits under the whole bar, inside the gutters, rather than right-aligned to
+   the button, which would push its left side off the screen */
+@media (max-width: 599px) {
+  .toc { position: static; }
+  .toc ol { left: var(--gutter); right: var(--gutter); top: calc(100% + 2px); width: auto; }
+}
 .bar-scale {
   position: absolute; left: 0; right: 0; bottom: 0; height: 6px;
   background:
