@@ -1,7 +1,7 @@
 # Waiting, weighted
 
-**Working draft.** This study is still in development, and its paper isn't public yet. The code,
-the experiments, and the site are here as they stand, and they may change.
+**Working draft.** This study is still in development. Paper in preparation; draft available upon
+request. The code, the experiments, and the site are here as they stand, and they may change.
 
 Code and interactive site for a study of optimal decision bounds when the cost of time changes
 (Ryan Kamp, 2026).
@@ -16,8 +16,8 @@ whatever the cost. A rule built on the result, the weighted look-ahead, is teste
 policy on 210 held-out cost schedules.
 
 - **Paper:** *Waiting, weighted: optimal decision bounds when the cost of time changes*, in
-  development and not public yet. `paper/` holds the figures, tables, and numbers it quotes, all
-  generated from `experiments/results/`.
+  preparation; draft available upon request. `paper/` holds the figures, tables, and numbers it
+  quotes, all generated from `experiments/results/`.
 - **Site:** the decision machine, an interactive explainer with live versions of the paper's
   results, at https://speed-accuracy.rk-folio-5f2dc2.pages.dev. Its source is in `site/`.
 
@@ -78,4 +78,4 @@ sits beside them.
 
 ## Cite
 
-The paper isn't public yet. To cite the code, use `CITATION.cff`.
+Paper in preparation; draft available upon request. To cite the code, use `CITATION.cff`.
