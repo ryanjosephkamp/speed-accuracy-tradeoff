@@ -772,7 +772,7 @@
 <section class="col" id="first-order" aria-labelledby="h-first-order">
   <h2 id="h-first-order">Exact to first order</h2>
   <div data-block="first-order-1">
-    <p>For small changes in cost, the rule is more than a good guess. The draft paper’s first-order analysis predicts that the best bounds move by the weighted average of my 2025 rule’s moves, with exactly these weights, and that when the cost changes smoothly, the error shrinks at least as fast as the square of the change. The code tests this against the exact bounds: on a 10% wiggle in the cost, <i>c</i>(<i>t</i>) = <i>c</i><sub>0</sub>(1 + 0.1 sin <i>ωt</i>), the predicted swing is within <span data-n="SweepSwingTenth">0.2</span>% of the exact one and its timing within <span data-n="ClosedFormWorstLead">0.24</span>° across the paper’s test cases.</p>
+    <p>For small changes in cost, the rule is more than a good guess. The paper proves that, to first order, the best bounds move by the weighted average of my 2025 rule’s moves, with exactly these weights; when the cost changes smoothly, the error shrinks at least as fast as the square of the change. On a 10% wiggle in the cost, <i>c</i>(<i>t</i>) = <i>c</i><sub>0</sub>(1 + 0.1 sin <i>ωt</i>), the predicted swing is within <span data-n="SweepSwingTenth">0.2</span>% of the exact one and its timing within <span data-n="ClosedFormWorstLead">0.24</span>° across the paper’s test cases.</p>
     <p>The best bounds move ahead of the cost, by close to an eighth of a cycle when the cost changes fast. My 2025 rule moves with the cost, never ahead of it. Change how fast the cost wiggles and read the gap at the line.</p>
   </div>
 </section>

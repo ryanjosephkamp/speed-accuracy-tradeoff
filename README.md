@@ -11,7 +11,7 @@ then decides. When every moment of waiting costs the same, the best bound is fla
 form. When the cost of time changes during the decision, the best bound moves, and the usual way to
 find it is dynamic programming. The draft's main result is that, to first order, the optimal bound at each
 moment is the constant-cost bound at a weighted average of the cost over the near future. It gives
-those weights in closed form and finds that, on average, they reach at most about 0.62 σ²/μ² ahead,
+those weights in closed form and shows that, on average, they reach at most about 0.62 σ²/μ² ahead,
 whatever the cost. A rule built on the result, the weighted look-ahead, is tested against the exact
 policy on 210 held-out cost schedules.
 

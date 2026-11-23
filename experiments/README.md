@@ -17,7 +17,7 @@ reliability, the reference is `unknown.backward_induction`, which doesn't change
 |---|---|
 | `random_schedules.py` | Runs the 90 development schedules (smooth, steps, and hard deadlines; seed 2026) and records the losses of the per-moment rule and the weighted look-ahead. |
 | `held_out.py` | Runs the 210 held-out schedules from `families.py` (seed 20261111; seven families, four not used in development) and scores seven policies: per-moment, weighted, weighted in one pass, averaged cost, two shifted per-moment rules, and the best constant bound. |
-| `first_order_sweep.py` | Tests the first-order prediction at three costs, two frequencies, and four perturbation sizes. |
+| `first_order_sweep.py` | Tests the first-order theorem at three costs, two frequencies, and four perturbation sizes. |
 | `grid_refinement.py` | Rescores eight development schedules on four grids, and measures how far 30 updates of the weighted rule are from a fixed point. |
 | `horizon_floor.py` | At constant costs, measures what the forced choice at t = 10 costs the constant-cost bound, which every rule that ignores the horizon shares. |
 | `unknown_reliability.py` | For a drift drawn once per trial, compares the frozen-time, weighted, plug-in, and best fixed-bound policies. |
