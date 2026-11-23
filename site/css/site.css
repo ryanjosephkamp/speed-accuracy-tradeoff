@@ -160,11 +160,14 @@ a:hover { text-decoration-color: currentColor; }
 .toc summary::-webkit-details-marker { display: none; }
 .toc summary svg { width: 14px; height: 14px; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .toc[open] summary svg { transform: rotate(180deg); }
+/* the hairline edge keeps the menu apart from a print behind it, which in the dark edition is
+   the same black */
 .toc ol {
   position: absolute; right: 0; top: calc(100% + 6px);
   width: min(22rem, calc(100vw - 2 * var(--gutter)));
   margin: 0; padding: 8px 0; list-style: none;
   background: var(--print); color: var(--print-ink);
+  border: 1px solid var(--print-line);
   box-shadow: 0 12px 32px var(--lift);
   counter-reset: toc;
 }
