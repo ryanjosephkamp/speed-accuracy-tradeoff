@@ -56,3 +56,20 @@ def test_unknown_reliability_matches_monte_carlo():
     correct[idx] = np.sign(x[idx]) == np.sign(mu[idx])
     assert correct.mean() == pytest.approx(o.p_correct, abs=0.01)
     assert rt.mean() == pytest.approx(o.mean_rt, abs=0.02)
+
+
+@pytest.mark.parametrize("shape", ["flat", "collapsing"])
+def test_decision_times_are_a_distribution_consistent_with_the_scorer(shape):
+    # The decision-time law behind the loss-formula check: it sums to one (undecided trials count
+    # at the last time), and its mean time and mean cost are the scorer's.
+    dt = 0.002
+    ts = np.arange(0.0, 6.0 + dt / 2, dt)
+    bound = np.full(len(ts), 1.1) if shape == "flat" else 1.5 * np.exp(-ts / 1.5)
+    cost = lambda t: 0.05 + 0.1 * np.asarray(t, float)
+    f = evaluate.known_decision_times(bound, ts)
+    out = evaluate.known_reward(bound, ts, cost)
+    assert np.all(f >= 0)
+    assert f.sum() == pytest.approx(1.0, abs=1e-9)
+    assert f @ ts == pytest.approx(out.mean_rt, abs=1e-9)
+    paid = np.concatenate([[0.0], np.cumsum(cost(ts[:-1]) * dt)])  # cost paid before deciding at ts[k]
+    assert f @ paid == pytest.approx(out.mean_cost, abs=1e-9)

@@ -53,3 +53,32 @@ def test_weighted_bound_nearly_matches_the_exact_policy(cost, horizon):
 
     assert loss(shortcuts.weighted_bound(cost, ts)) < 0.1
     assert loss(shortcuts.per_moment(cost, ts)) > 0.5
+
+
+@pytest.mark.parametrize("c0", [0.02, 0.1, 0.3])
+def test_boundary_kernel_matches_the_closed_form_transform_and_mean(c0):
+    # The binned kernel the rule uses, against 2 c0 cosh^2 b0 [r tanh(r b0) - tanh b0] / lam and the
+    # mean look-ahead c0 [sinh(2 b0)/2 - b0 + 2 b0^2 tanh b0]. Bin midpoints cost a little accuracy.
+    b0 = ddm.optimal_bound(c0)
+    s, w = shortcuts.boundary_kernel(b0)
+    for lam in (0.3, 1.0, 5.0):
+        r = np.sqrt(2 * lam + 1)
+        closed = 2 * c0 * np.cosh(b0) ** 2 * (r * np.tanh(r * b0) - np.tanh(b0)) / lam
+        assert w @ np.exp(-lam * s) == pytest.approx(closed, abs=1e-3)
+    mean = c0 * (np.sinh(2 * b0) / 2 - b0 + 2 * b0 ** 2 * np.tanh(b0))
+    assert w @ s == pytest.approx(mean, rel=2e-3)
+
+
+def test_one_pass_is_per_moment_at_a_constant_cost_and_close_to_the_full_rule_for_small_changes():
+    # The one-pass rule (kernel for the per-moment bound, no iteration), from the held-out table.
+    ts = np.arange(0.0, 4.0, 0.005)
+    flat = lambda t: np.full_like(np.asarray(t, float), 0.1)
+    one = shortcuts.weighted_bound(flat, ts, self_consistent=False)
+    assert np.allclose(one, shortcuts.per_moment(flat, ts), atol=1e-12)
+    small = lambda t: 0.1 + 0.01 * np.sin(4 * np.asarray(t, float))
+    ev = lambda g: ddm.evidence(g, 1.0)
+    one = ev(shortcuts.weighted_bound(small, ts, self_consistent=False))
+    full = ev(shortcuts.weighted_bound(small, ts))
+    pm = ev(shortcuts.per_moment(small, ts))
+    # both are first-order exact, so they differ at second order, far less than the per-moment rule
+    assert np.max(np.abs(one - full)) < 0.02 * np.max(np.abs(pm - full))

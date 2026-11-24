@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from speed_accuracy import ddm, known
+from speed_accuracy.shortcuts import OVERSHOOT
 
 
 def test_transition_rows_are_distributions_and_symmetric():
@@ -48,3 +49,14 @@ def test_rising_cost_lowers_the_bound_before_the_rise():
     flat, _, _ = known.value_iteration(0.1, n=300, dt=0.002)
     assert b[0] < flat - 0.01          # the exact policy anticipates the rise
     assert np.all(np.diff(b[ts < 3]) <= 1e-9)
+
+
+@pytest.mark.parametrize("c", [0.03, 0.1, 0.3, 1.0])
+def test_evidence_grid_program_matches_the_closed_form(c):
+    # The reference policy for every symmetric experiment, at a constant cost, against B(c) moved
+    # inward for monitoring every dt. The horizon is long so the forced choice at its end doesn't
+    # pull the bound down before t = 2 (at c = 0.03 and horizon 10, it moves it by about 0.001).
+    ts, b, _ = known.backward_induction_x(lambda t: np.full_like(t, c), 14.0, dt=0.002, h=0.005)
+    early = ts <= 2.0
+    expected = ddm.optimal_bound(c) - OVERSHOOT * np.sqrt(0.002)
+    assert np.max(np.abs(b[early] - expected)) < 5e-4  # a tenth of the grid spacing
