@@ -1,23 +1,19 @@
 # Waiting, weighted
 
-**Working draft.** This study is still in development. Paper in preparation; draft available upon
-request. The code, the experiments, and the site are here as they stand, and they may change.
-
-Code and interactive site for a study of optimal decision bounds when the cost of time changes
-(Ryan Kamp, 2026).
+Code, paper, and interactive site for *Waiting, weighted: optimal decision bounds when the cost of
+time changes* (Ryan Kamp, 2026).
 
 A drift-diffusion decision maker gathers noisy evidence until the running total reaches a bound,
 then decides. When every moment of waiting costs the same, the best bound is flat and has a closed
 form. When the cost of time changes during the decision, the best bound moves, and the usual way to
-find it is dynamic programming. The draft's main result is that, to first order, the optimal bound at each
+find it is dynamic programming. The paper shows that, to first order, the optimal bound at each
 moment is the constant-cost bound at a weighted average of the cost over the near future. It gives
 those weights in closed form and shows that, on average, they reach at most about 0.62 σ²/μ² ahead,
 whatever the cost. A rule built on the result, the weighted look-ahead, is tested against the exact
 policy on 210 held-out cost schedules.
 
-- **Paper:** *Waiting, weighted: optimal decision bounds when the cost of time changes*, in
-  preparation; draft available upon request. `paper/` holds the figures, tables, and numbers it
-  quotes, all generated from `experiments/results/`.
+- **Paper:** [`paper/Kamp-2026-Waiting-weighted.pdf`](paper/Kamp-2026-Waiting-weighted.pdf)
+  (version 1.2, November 2026), with its LaTeX source in `paper/`.
 - **Site:** the decision machine, an interactive explainer with live versions of the paper's
   results, at https://speed-accuracy.rk-folio-5f2dc2.pages.dev. Its source is in `site/`.
 - **Talk and poster:** the slides,
@@ -38,8 +34,8 @@ implementation with tests, and the site lists what was wrong in the 2025 code an
 |---|---|
 | `src/speed_accuracy/` | The Python package (below) |
 | `tests/` | Tests for the package, run with pytest |
-| `experiments/` | Every measurement in the study, with its stored results; see its README |
-| `paper/` | The figures, generated tables, and numbers for the paper (the paper itself isn't public yet) |
+| `experiments/` | Every measurement in the paper, with its stored results; see its README |
+| `paper/` | The paper's LaTeX source, figures, generated tables and numbers, and PDF |
 | `site/` | The site: static HTML, CSS, and JavaScript, with checks against the Python results; see its README |
 | `talk/` | The talk's slides, as a PDF |
 | `poster/` | The poster, as PDFs at 48 by 36 inches and at A0 |
@@ -64,10 +60,11 @@ uv run --group dev pytest
 uv run python experiments/held_out.py
 ```
 
-The figures, tables, and quoted numbers are generated from `experiments/results/`:
+The paper's figures, tables, and quoted numbers are generated from `experiments/results/`:
 
 ```bash
 uv run --group paper python paper/make_figures.py
+cd paper && latexmk -pdf main.tex
 ```
 
 The site needs no build to preview:
@@ -78,11 +75,12 @@ python3 -m http.server 8000 --directory site
 
 ## License
 
-The code is under the MIT License (`LICENSE`). The figures and tables in `paper/` are under
+The code is under the MIT License (`LICENSE`). The paper's text and figures in `paper/` are under
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The fonts in `site/fonts/` are under the
 SIL Open Font License, and Three.js in `site/js/vendor/` under its MIT License; each license file
 sits beside them.
 
 ## Cite
 
-Paper in preparation; draft available upon request. To cite the code, use `CITATION.cff`.
+Ryan Kamp. *Waiting, weighted: optimal decision bounds when the cost of time changes.* Version
+1.2, November 2026. Preprint. `CITATION.cff` has the same in citation-file form.
