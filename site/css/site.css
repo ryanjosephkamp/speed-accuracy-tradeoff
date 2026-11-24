@@ -251,8 +251,6 @@ a:hover { text-decoration-color: currentColor; }
 .hero-copy h1 { color: var(--print-ink); font-size: clamp(2.1rem, 9vw, 4.4rem); }
 .hero-copy .lede { margin-top: 10px; color: var(--print-ink); font-family: var(--serif); font-size: clamp(1.02rem, 3.4vw, 1.3rem); max-width: 34rem; }
 .hero-copy .byline { margin-top: 8px; color: var(--print-dim); }
-.hero-copy .draft-note { margin: 6px 0 0; max-width: 34rem; color: var(--print-dim); font: 500 0.82rem/1.45 var(--sans); }
-.hero-copy .draft-note b { color: var(--print-ink); font-weight: 650; }
 .machine-stage { position: relative; margin-inline: calc(-1 * var(--gutter)); }
 #machine, #machine-glow { display: block; width: 100%; height: min(64svh, 640px); min-height: 420px; }
 #machine-glow { position: absolute; inset: 0; }
