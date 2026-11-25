@@ -12,7 +12,8 @@ initAppearance();
 initSound();
 
 const toc = document.getElementById("toc");
-const links = [...toc.querySelectorAll("a")];
+// the menu's own sections; the links at its foot leave the page
+const links = [...toc.querySelectorAll("ol a")];
 const sections = links.map((a) => document.querySelector(a.getAttribute("href")));
 const bar = document.getElementById("progress");
 
@@ -32,7 +33,7 @@ addEventListener("scroll", () => {
   requestAnimationFrame(() => { ticking = false; onScroll(); });
 }, { passive: true });
 onScroll();
-links.forEach((a) => a.addEventListener("click", () => { toc.open = false; }));
+toc.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => { toc.open = false; }));
 document.addEventListener("click", (e) => { if (toc.open && !toc.contains(e.target)) toc.open = false; });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && toc.open) { toc.open = false; toc.querySelector("summary").focus(); } });
 
