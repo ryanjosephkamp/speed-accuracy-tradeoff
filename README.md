@@ -20,6 +20,10 @@ policy on 210 held-out cost schedules.
   quotes, all generated from `experiments/results/`.
 - **Site:** the decision machine, an interactive explainer with live versions of the paper's
   results, at https://speed-accuracy.rk-folio-5f2dc2.pages.dev. Its source is in `site/`.
+- **Talk and poster:** the slides,
+  [`talk/Kamp-2026-Waiting-weighted-talk.pdf`](talk/Kamp-2026-Waiting-weighted-talk.pdf), and the
+  poster, [`poster/Kamp-2026-Waiting-weighted-poster.pdf`](poster/Kamp-2026-Waiting-weighted-poster.pdf)
+  (48 by 36 inches), with an [A0 copy](poster/Kamp-2026-Waiting-weighted-poster-A0.pdf).
 
 This project revisits my 2025 undergraduate research capstone at the University of Cincinnati,
 [perceptual-decision-making-capstone](https://github.com/ryanjosephkamp/perceptual-decision-making-capstone),
@@ -36,6 +40,8 @@ implementation with tests, and the site lists what was wrong in the 2025 code an
 | `experiments/` | Every measurement in the study, with its stored results; see its README |
 | `paper/` | The figures, generated tables, and numbers for the paper (the paper itself isn't public yet) |
 | `site/` | The site: static HTML, CSS, and JavaScript, with checks against the Python results; see its README |
+| `talk/` | The talk's slides, as a PDF |
+| `poster/` | The poster, as PDFs at 48 by 36 inches and at A0 |
 
 | Module | What it computes |
 |---|---|
