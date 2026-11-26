@@ -24,6 +24,7 @@ policy on 210 held-out cost schedules.
   [`talk/Kamp-2026-Waiting-weighted-talk.pdf`](talk/Kamp-2026-Waiting-weighted-talk.pdf), and the
   poster, [`poster/Kamp-2026-Waiting-weighted-poster.pdf`](poster/Kamp-2026-Waiting-weighted-poster.pdf)
   (48 by 36 inches), with an [A0 copy](poster/Kamp-2026-Waiting-weighted-poster-A0.pdf).
+- **Known issues:** [`KNOWN-ISSUES.md`](KNOWN-ISSUES.md) lists known and potential problems and their status.
 
 This project revisits my 2025 undergraduate research capstone at the University of Cincinnati,
 [perceptual-decision-making-capstone](https://github.com/ryanjosephkamp/perceptual-decision-making-capstone),
