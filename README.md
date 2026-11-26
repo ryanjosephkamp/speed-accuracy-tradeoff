@@ -20,6 +20,9 @@ policy on 210 held-out cost schedules.
   [`talk/Kamp-2026-Waiting-weighted-talk.pdf`](talk/Kamp-2026-Waiting-weighted-talk.pdf), and the
   poster, [`poster/Kamp-2026-Waiting-weighted-poster.pdf`](poster/Kamp-2026-Waiting-weighted-poster.pdf)
   (48 by 36 inches), with an [A0 copy](poster/Kamp-2026-Waiting-weighted-poster-A0.pdf).
+- **Crash Course:** a guided read of the paper, at
+  https://ryanjosephkamp.github.io/speed-accuracy-crash-course/.
+- **Film:** the paper in six minutes, on [YouTube](https://youtu.be/OhTQqcrWGbk).
 - **Known issues:** [`KNOWN-ISSUES.md`](KNOWN-ISSUES.md) lists known and potential problems and their status.
 
 This project revisits my 2025 undergraduate research capstone at the University of Cincinnati,
