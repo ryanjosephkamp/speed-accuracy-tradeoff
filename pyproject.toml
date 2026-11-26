@@ -1,7 +1,7 @@
 [project]
 name = "speed-accuracy-tradeoff"
 version = "0.1.0"
-description = "Optimal decision bounds for the speed-accuracy trade-off, computed exactly and tested."
+description = "Optimal decision bounds for the speed-accuracy trade-off, computed by dynamic programming and tested."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["numpy>=1.26", "scipy>=1.11"]

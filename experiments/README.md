@@ -9,9 +9,9 @@ Losses are in points per 100 trials:
     100 × (reward of the exact policy − reward of the rule)
 
 The exact reference for known reliability is `known.backward_induction_x`. It runs on the
-scorer's own evidence grid, so no policy the scorer can see does better. For unknown
-reliability, the reference is `unknown.backward_induction`, which doesn't change at 300, 600, or
-900 grid points.
+scorer's own evidence grid, so no policy does better there, up to the interpolation of bounds
+between grid points. For unknown reliability, the reference is `unknown.backward_induction`,
+which doesn't change at 300, 600, or 900 grid points.
 
 | Script | What it does |
 |---|---|
@@ -26,7 +26,7 @@ reliability, the reference is `unknown.backward_induction`, which doesn't change
 | `showcase.py` | Writes the bound curves for the figures and the first-order (small sinusoidal cost) check. |
 | `lopsided.py` | Unequal rewards for the two choices. Checks the first-order kernel at each bound against a small sinusoidal cost, then runs random schedules for the per-moment and weighted rules. |
 | `loss_formula.py` | Checks that a policy whose bound misses the optimum by η(t) loses about E[c(τ) η(τ)²], at the decision time τ. The forced choice at the horizon is left out of the sum. |
-| `loss_scaling.py` | Scales one smooth cost shape in log c at five amplitudes and records how the per-moment and weighted rules' losses grow: second order for the per-moment rule, close to fourth order for the weighted rule. |
+| `loss_scaling.py` | Scales one smooth cost shape in log c at five amplitudes and records how the per-moment and weighted rules' losses grow: second order for the per-moment rule, close to fourth order for the weighted rule (an effective order of 3.7 to 3.9 over amplitudes 0.2 to 0.8, on two grids, for one shape; a measurement, not a proof). |
 
 Run any of them from the repository root:
 
